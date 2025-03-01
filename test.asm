@@ -7,13 +7,16 @@
 %include "myLib/print_binary.asm"
 %include "myLib/print_ascii_value.asm"
 
+%include "myLib/rand_int.asm"
+
+
 %include "myLib/file_open.asm"
 %include "myLib/file_close.asm"
 %include "myLib/file_read.asm"
 
 
 section .data
-    msg1 db "This is using print buffer ", 0
+    error db "Got a number outside range ", 0
     msg2 db "Hello, ", 10, 0
     num db "142", 10, 0
     filename db "test.txt", 0
