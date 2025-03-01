@@ -1,3 +1,4 @@
+%include "myLib/print_ascii_value.asm"
 
 ; input:
 ;   rax number to be printed
@@ -7,14 +8,10 @@
 _printDecimal:
     push rax
     push rbx
-    push rcx
     push rdx
     push r10
 
     mov rbx, 0 ; counter
-
-    mov rcx, PRINT_BUFFER ; address of the print buffer 
-    add rcx, [PRINT_BUFFER_LENGTH] ; add the length of current buffer
 
 _loopDigit:
     mov rdx, 0
@@ -34,13 +31,7 @@ _loopDigit:
 
 _loopAddBuffer:
     pop rax ; get number of stack
-
-    mov [rcx], rax ; add to bufffer
-    inc rcx ; move buffer pointer
-
-    ; add one to the total length of buffer
-    mov rdx, 1
-    add [PRINT_BUFFER_LENGTH], rdx
+    call _printAsciiValue
 
     dec rbx ; counter
     cmp rbx, 0
@@ -48,7 +39,6 @@ _loopAddBuffer:
 
     pop r10
     pop rdx
-    pop rcx
     pop rbx
     pop rax
 

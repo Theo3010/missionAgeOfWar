@@ -1,65 +1,59 @@
 %include "myLib/print_ascii_value.asm"
 
-; input:
-;   rax - number to be add to BUFFER
-; output:
-;   Adds number - in hex - to the BUFFER
-_printHex:
-
+_printBinary:
     push rbx
-    push rdi
     push rdx
+    push rdi
 
     mov rbx, 0 ; counter
 
     mov rdi, rax
+    
     mov rax, 48
     call _printAsciiValue
 
-    mov rax, 120
+    mov rax, 98
     call _printAsciiValue
 
     mov rax, rdi
 
-_loopHex:
+_loopBinary:
     mov rdx, rax
     
-    and rdx, 15
+    and rdx, 1
 
     add rdx, 48
-    cmp rdx, 58
-    jl _skip
-    add rdx, 39
-_skip:
 
     push rdx
     inc rbx
 
-    shr rax, 4
+    shr rax, 1
 
     cmp rax, 0
-    jne _loopHex
+    jne _loopBinary
 
-_loopAdd:
+_loopBinaryAdd:
     pop rax
     call _printAsciiValue
     dec rbx
 
     cmp rbx, 0
-    jne _loopAdd
+    jne _loopBinaryAdd
 
-    pop rdx
     pop rdi
+    pop rdx
     pop rbx
 
     ret
 
 
-%macro print_hex 1
+%macro print_binary 1
+
     push rax
 
     mov rax, %1
-    call _printHex
+    call _printBinary
 
     pop rax
+
 %endmacro

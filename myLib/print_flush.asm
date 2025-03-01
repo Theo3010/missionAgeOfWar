@@ -11,7 +11,7 @@ _printFlush:
     mov rax, 1
     mov rdi, 1
     mov rsi, PRINT_BUFFER
-    mov rdx, PRINT_BUFFER_LENGTH
+    mov rdx, [PRINT_BUFFER_LENGTH]
     syscall
 
     mov rax, 0
