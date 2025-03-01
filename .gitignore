@@ -1,0 +1,43 @@
+# Ignore object files
+*.o
+
+# Ignore .vscode folder
+.vscode/
+
+# Ignore executable files
+*.out
+*.exe
+
+# Ignore backup files
+*~
+
+# Ignore core dumps
+core
+
+# Ignore temporary files
+*.tmp
+*.temp
+
+# Ignore compiled binary files
+*.bin
+
+# Ignore log files
+*.log
+
+# Ignore directories
+/build/
+/dist/
+/bin/
+/obj/
+
+# Ignore dependency files
+*.d
+
+# Ignore debug files
+*.dbg
+
+# Ignore any other temporary or unnecessary files
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
