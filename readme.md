@@ -1,7 +1,7 @@
 
 # Mission Age of War
 
-Mission Age of War is a strategy game where players build and manage their own empire, engage in battles, and conquer territories.
+Mission Age of War is my journey to learn assembly. The goal is to re-create the game Age of War from scratch in assembly with no external libraries.
 
 ## Project Structure
 
@@ -46,8 +46,7 @@ To run the assembled and linked executable, use:
 ```
 
 ## Contributing
-
-If you would like to contribute to the project, please fork the repository and submit a pull request.
+Contributions are not being accepted at this time as this project is part of a personal learning journey.
 
 ## License
 
