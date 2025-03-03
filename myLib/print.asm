@@ -1,3 +1,6 @@
+%ifndef PRINT
+%define PRINT
+
 %include "myLib/print_ascii_value.asm"
 
 ; intput
@@ -37,3 +40,5 @@ _printdone:
 
     pop rax
 %endmacro
+
+%endif

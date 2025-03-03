@@ -7,7 +7,7 @@ _fileClose:
     ret
 
 
-%macro fileClose 1
+%macro file_close 1
     mov rdi, %1
     call _fileClose
 %endmacro

@@ -1,3 +1,6 @@
+%ifndef PRINT_FLUSH
+%define PRINT_FLUSH
+
 ; output:
 ;   writes the PRINT BUFFER to the terminal
 _printFlush:
@@ -28,3 +31,5 @@ _printFlush:
 %macro print_flush 0
     call _printFlush
 %endmacro
+
+%endif

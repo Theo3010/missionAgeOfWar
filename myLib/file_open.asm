@@ -9,7 +9,7 @@ _fileOpen:
 
     ret
 
-%macro fileOpen 3
+%macro file_open 3
     mov rdi, %1
     mov rsi, %2
     mov rdx, %3

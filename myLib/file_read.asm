@@ -11,7 +11,7 @@ _fileRead:
     ret
 
 
-%macro fileRead 3
+%macro file_read 3
     push rdi
     push rsi
     push rdx

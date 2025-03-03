@@ -4,6 +4,10 @@ all: $(program) run clean
 
 build: $(program)
 
+back: program = back
+
+back: $(program)
+
 $(program): $(program).o
 	@ld -m elf_x86_64 $(program).o -o $(program)
 
@@ -16,4 +20,4 @@ run: $(program)
 clean:
 	@rm -f $(program).o $(program)
 
-.PHONY: all clean run
+.PHONY: all clean run back
