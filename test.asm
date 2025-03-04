@@ -8,6 +8,7 @@
 %include "myLib/print_ascii_value.asm"
 
 %include "myLib/get_input.asm"
+%include "myLib/to_integer.asm"
 
 
 %include "myLib/rand_int.asm"
@@ -58,13 +59,17 @@ exit:
 
 _start:
 
-    ; save_termois
+    file_open filename, 0, 0644o
 
-    raw_mode
+    file_read rax, input, 16
 
-    sleep 5000000
+    file_close rax
 
-    reset_termois
+    to_integer input
+
+    print_decimal rax
+    print_ascii_value 10
+
 
     print_flush
 

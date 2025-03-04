@@ -1,4 +1,5 @@
-
+; int {rax} file_read(file descriptor {rdi}, buffer {rsi}, length {rdx});
+;   return the number of read bytes
 
 _fileRead:
     push rax
