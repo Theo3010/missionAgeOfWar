@@ -1,28 +1,29 @@
-%define PRINT_BUFFER_SIZE 1024
+ %define PRINT_BUFFER_SIZE 1024
 
-%include "myLib/print_flush.asm"
-%include "myLib/print.asm"
-%include "myLib/print_decimal.asm"
-%include "myLib/print_hex.asm"
-%include "myLib/print_binary.asm"
-%include "myLib/print_ascii_value.asm"
+; %include "myLib/print_flush.asm"
+; %include "myLib/print.asm"
+; %include "myLib/print_decimal.asm"
+; %include "myLib/print_hex.asm"
+; %include "myLib/print_binary.asm"
+; %include "myLib/print_ascii_value.asm"
+%include "myLib/print_matrix.asm"
 
-%include "myLib/get_input.asm"
-%include "myLib/to_integer.asm"
+; %include "myLib/get_input.asm"
+; %include "myLib/to_integer.asm"
 
 
-%include "myLib/rand_int.asm"
+; %include "myLib/rand_int.asm"
 
-%include "myLib/get_time.asm"
-%include "myLib/sleep.asm"
+; %include "myLib/get_time.asm"
+; %include "myLib/sleep.asm"
 
-%include "myLib/raw_mode.asm"
-%include "myLib/save_termois.asm"
-%include "myLib/reset_termois.asm"
+; %include "myLib/raw_mode.asm"
+; %include "myLib/save_termois.asm"
+; %include "myLib/reset_termois.asm"
 
-%include "myLib/file_open.asm"
-%include "myLib/file_close.asm"
-%include "myLib/file_read.asm"
+; %include "myLib/file_open.asm"
+; %include "myLib/file_close.asm"
+; %include "myLib/file_read.asm"
 
 
 section .data
@@ -33,6 +34,7 @@ section .data
     filename db "test.txt", 0
     PRINT_BUFFER_LENGTH dq 0
 
+    matrix db 0, 5, 10, 15, 20, 25
 
 section .bss
     input resb 16
@@ -59,17 +61,8 @@ exit:
 
 _start:
 
-    file_open filename, 0, 0644o
-
-    file_read rax, input, 16
-
-    file_close rax
-
-    to_integer input
-
-    print_decimal rax
+    print_matrix matrix, 3, 2
     print_ascii_value 10
-
 
     print_flush
 

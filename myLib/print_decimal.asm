@@ -1,3 +1,6 @@
+%ifndef PRINT_DECIMAL
+%define PRINT_DECIMAL
+
 %include "myLib/print_ascii_value.asm"
 
 ; input:
@@ -52,3 +55,5 @@ _loopAddBuffer:
 
     pop rax
 %endmacro
+
+%endif

@@ -1,4 +1,3 @@
-
 ; set a default buffer size if not set.
 %ifndef PRINT_BUFFER_SIZE
 %define PRINT_BUFFER_SIZE 1024
@@ -8,6 +7,9 @@
 ; stop multiple defintion error
 %ifndef PRINT_ASCII_VALUE
 %define PRINT_ASCII_VALUE
+
+%include "myLib/print_flush.asm"
+
 ; input:
 ;   rax number to be printed
 ; output:
