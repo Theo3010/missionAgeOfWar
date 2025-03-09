@@ -18,18 +18,12 @@ _printMatrixLoop:
     
     inc rax
     dec rbx
-    jz _nextRow
+    jz _printMatrixDone
 
     print_ascii_value 44
     print_ascii_value 32
 
     jmp _printMatrixLoop
-
-_nextRow:
-    dec rcx
-    jz _printMatrixLoop
-    
-    mov rbx, r8
 
 _printMatrixDone:
     print_ascii_value 93
@@ -40,14 +34,13 @@ _printMatrixDone:
 
 
 
-%macro print_matrix 3
+%macro print_array 2
     push rax
     push rbx
     push rcx
 
     mov rax, %1
     mov rbx, %2
-    mov rcx, %3
     call _printMatrix
 
     pop rax

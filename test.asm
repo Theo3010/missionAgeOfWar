@@ -6,7 +6,7 @@
 ; %include "myLib/print_hex.asm"
 ; %include "myLib/print_binary.asm"
 ; %include "myLib/print_ascii_value.asm"
-%include "myLib/print_matrix.asm"
+%include "myLib/print_array.asm"
 
 ; %include "myLib/get_input.asm"
 ; %include "myLib/to_integer.asm"
@@ -34,7 +34,7 @@ section .data
     filename db "test.txt", 0
     PRINT_BUFFER_LENGTH dq 0
 
-    matrix db 0, 5, 10, 15, 20, 25
+    array db 0, 0, 0, 0, 0, 30
 
 section .bss
     input resb 16
@@ -61,7 +61,15 @@ exit:
 
 _start:
 
-    print_matrix matrix, 3, 2
+    ; array_create ; heap
+    mov rax, array
+    movzx rbx, byte [rax+5] ; rbx = array[5]
+    mov byte [rax+5], 10 ; array[5] = 10
+
+    print_array array, 6
+    print_ascii_value 10
+
+    print_decimal rbx
     print_ascii_value 10
 
     print_flush
