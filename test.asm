@@ -1,12 +1,19 @@
- %define PRINT_BUFFER_SIZE 1024
+%define PRINT_BUFFER_SIZE 1024
+%define HEAP_SIZE 128
 
-; %include "myLib/print_flush.asm"
-; %include "myLib/print.asm"
-; %include "myLib/print_decimal.asm"
-; %include "myLib/print_hex.asm"
-; %include "myLib/print_binary.asm"
-; %include "myLib/print_ascii_value.asm"
+
+%include "myLib/exit.asm"
+%include "myLib/heap_init.asm"
+%include "myLib/heap_allocate.asm"
+
+%include "myLib/print_flush.asm"
+%include "myLib/print.asm"
+%include "myLib/print_decimal.asm"
+%include "myLib/print_hex.asm"
+%include "myLib/print_binary.asm"
+%include "myLib/print_ascii_value.asm"
 %include "myLib/print_array.asm"
+%include "myLib/print_memory.asm"
 
 ; %include "myLib/get_input.asm"
 ; %include "myLib/to_integer.asm"
@@ -30,11 +37,10 @@ section .data
     error db "Got a number outside range ", 0
     msg2 db "2 secounds has pased", 10, 0
     num db "142", 10, 0
+    allocation db "allocate memory at: ", 0
     clear_screen db 27, 91, 50, 74, 0
     filename db "test.txt", 0
     PRINT_BUFFER_LENGTH dq 0
-
-    array db 0, 0, 0, 0, 0, 30
 
 section .bss
     input resb 16
@@ -43,35 +49,27 @@ section .bss
 
     oldTermois resb 48
     rawTermios resb 48
-
     key resb 4
 
     PRINT_BUFFER resb PRINT_BUFFER_SIZE
+    HEAP resb HEAP_SIZE
 
 section .text
     global _start
 
 
-exit:
-
-    mov rax, 60 ; sys_exit
-    mov rdi, 0 ; exit code
-    syscall
-
-
 _start:
 
-    ; array_create ; heap
-    mov rax, array
-    movzx rbx, byte [rax+5] ; rbx = array[5]
-    mov byte [rax+5], 10 ; array[5] = 10
+    heap_init
 
-    print_array array, 6
-    print_ascii_value 10
+    heap_allocate 16
+    heap_allocate 24
 
-    print_decimal rbx
+    print allocation
+    print_hex rax
     print_ascii_value 10
+    print_memory HEAP, 8, 16
 
     print_flush
 
-    call exit
+    exit

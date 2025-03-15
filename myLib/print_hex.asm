@@ -1,3 +1,6 @@
+%ifndef PRINT_HEX
+%define PRINT_HEX
+
 %include "myLib/print_ascii_value.asm"
 
 ; input:
@@ -63,3 +66,6 @@ _loopAdd:
 
     pop rax
 %endmacro
+
+
+%endif
