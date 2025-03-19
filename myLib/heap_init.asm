@@ -8,7 +8,7 @@ _heapInit:
 
     add rax, HEAP_SIZE
 
-    mov byte [rax-8], HEAP_SIZE-16+2
+    mov byte [rax-8], HEAP_SIZE-16
 
     ret
 

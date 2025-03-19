@@ -2,10 +2,6 @@
 %define HEAP_SIZE 128
 
 
-%include "myLib/exit.asm"
-%include "myLib/heap_init.asm"
-%include "myLib/heap_allocate.asm"
-
 %include "myLib/print_flush.asm"
 %include "myLib/print.asm"
 %include "myLib/print_decimal.asm"
@@ -14,6 +10,15 @@
 %include "myLib/print_ascii_value.asm"
 %include "myLib/print_array.asm"
 %include "myLib/print_memory.asm"
+
+%include "myLib/exit.asm"
+%include "myLib/heap_init.asm"
+%include "myLib/heap_allocate.asm"
+%include "myLib/heap_realloc.asm"
+%include "myLib/heap_free.asm"
+
+%include "myLib/memory_copy.asm"
+
 
 ; %include "myLib/get_input.asm"
 ; %include "myLib/to_integer.asm"
@@ -58,17 +63,15 @@ section .text
     global _start
 
 
-_start:
+_printheap:
 
-    heap_init
-
-    heap_allocate 16
-    heap_allocate 24
-
-    print allocation
-    print_hex rax
-    print_ascii_value 10
     print_memory HEAP, 8, 16
+    print_ascii_value 10
+    print_ascii_value 10
+
+    ret
+
+_start:
 
     print_flush
 

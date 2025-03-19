@@ -37,7 +37,6 @@ _printMatrixDone:
 %macro print_array 2
     push rax
     push rbx
-    push rcx
 
     mov rax, %1
     mov rbx, %2
@@ -45,7 +44,6 @@ _printMatrixDone:
 
     pop rax
     pop rbx
-    pop rcx
 %endmacro
 
 %endif

@@ -9,6 +9,9 @@
 ;   int {rbx} is the rows of memory
 ;   int {rcx} is the colums of memory
 _printMemory:
+    push rdx
+    push r8
+
     mov rdx, rbx
     mov r8, rdx
 
@@ -28,13 +31,24 @@ _printMemoryLoopCol:
     dec rcx
     jnz _printMemoryLoopRow
 
+    pop r8
+    pop rdx
+
     ret
 
 %macro print_memory 3
+    push rax
+    push rbx
+    push rcx
+
     mov rax, %1
     mov rbx, %2
     mov rcx, %3
     call _printMemory
+
+    pop rcx
+    pop rbx
+    pop rax
 %endmacro
 
 %endif
