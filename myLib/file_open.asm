@@ -1,10 +1,6 @@
-
-; input:
-;   rdi - file name
-;   rsi - flags e.g O_READONLY
-;   rdx - permissions
-; output:
-;   rax - file descriptor
+; fd {rax} fileOpen(char* {rdi}, int {rsi}, int {rdx})
+;   takes a file name in {rdi}, flags in {rsi} and permissions in {rdx}.
+;   returns a file descriptor
 _fileOpen:
     mov rax, 2
     syscall
