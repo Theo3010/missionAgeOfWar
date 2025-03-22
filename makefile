@@ -15,7 +15,7 @@ $(program).o: $(program).asm
 	@nasm -f elf64 -o $(program).o $(program).asm
 
 run: $(program)
-	@./$(program)
+	@sudo ./$(program)
 
 clean:
 	@rm -f $(program).o $(program)

@@ -37,11 +37,13 @@
 %include "myLib/file_close.asm"
 %include "myLib/file_read.asm"
 
+%include "myLib/get_screenInfo.asm"
+
 
 section .data
     allocation db "allocate memory at: ", 0
     PRINT_BUFFER_LENGTH dq 0
-    fbfileName db "/dev/fb0", 0
+    fbfileName db `/dev/fb0\0`
     xRes db "X-resolution: ", 0
     yRes db "Y-resolution: ", 0
     bitsPrPixel db "bits per pixel: ", 0
@@ -63,14 +65,7 @@ section .text
 
 _start:
 
-
-    file_open fbfileName, 2, 0644o
-
-    mov rdi, rax
-    mov rsi, 0x4600
-    mov rdx, framebufferInfo
-    mov rax, 16
-    syscall
+    get_screenInfo framebufferInfo
 
     print xRes
     mov rbx, 0
@@ -90,7 +85,7 @@ _start:
     print_decimal rbx
     print_ascii_value 10
 
-    print screenBufferSize
+    print screenBufferSize 
     mov rbx, 0
     mov ebx, [framebufferInfo+0]
     imul ebx, [framebufferInfo+4]
