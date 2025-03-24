@@ -1,5 +1,5 @@
 %define PRINT_BUFFER_SIZE 1024
-%define HEAP_SIZE 128
+%define HEAP_SIZE 0x1000000 ; ~ 16 MB
 
 
 %include "myLib/print_flush.asm"
@@ -20,24 +20,22 @@
 %include "myLib/memory_copy.asm"
 
 
-; %include "myLib/get_input.asm"
-; %include "myLib/to_integer.asm"
+%include "myLib/get_input.asm"
+%include "myLib/to_integer.asm"
 
 
-; %include "myLib/rand_int.asm"
+%include "myLib/rand_int.asm"
 
-; %include "myLib/get_time.asm"
-; %include "myLib/sleep.asm"
-
-; %include "myLib/raw_mode.asm"
-; %include "myLib/save_termois.asm"
-; %include "myLib/reset_termois.asm"
+%include "myLib/get_time.asm"
+%include "myLib/sleep.asm"
 
 %include "myLib/file_open.asm"
-%include "myLib/file_close.asm"
 %include "myLib/file_read.asm"
+%include "myLib/file_write.asm"
+%include "myLib/file_close.asm"
 
 %include "myLib/get_screenInfo.asm"
+%include "myLib/calc_bitsPrPixel.asm"
 
 
 section .data
@@ -63,36 +61,50 @@ section .text
     global _start
 
 
+_printHeap:
+    mov rax, HEAP
+    print_memory rax, 8, 8
+    print_ascii_value 46
+    print_ascii_value 46
+    print_ascii_value 46
+    print_ascii_value 10
+    add rax, HEAP_SIZE - 0x40
+    print_memory rax, 8, 8
+    print_ascii_value 10
+    print_ascii_value 10
+
+    ret
+
 _start:
 
-    get_screenInfo framebufferInfo
+    file_open fbfileName, 2, 0644o ; fd rax = /dev/fb0
+    mov r15, rax
 
-    print xRes
-    mov rbx, 0
-    mov ebx, [framebufferInfo+0]
-    print_decimal rbx
-    print_ascii_value 10
+    get_screenInfo framebufferInfo, rax ; read framebuffer info from /dev/fb0
 
-    print yRes
-    mov rbx, 0
-    mov ebx, [framebufferInfo+4]
-    print_decimal rbx
-    print_ascii_value 10
+    calc_Bit_Pr_Pixel ; int rax = bits per pixel
 
-    print bitsPrPixel
-    mov rbx, 0
-    mov ebx, [framebufferInfo+24]
-    print_decimal rbx
-    print_ascii_value 10
+    mov rbx, rax
+    mov r10, rax
+    shr rbx, 3 ; div with 8
 
-    print screenBufferSize 
-    mov rbx, 0
-    mov ebx, [framebufferInfo+0]
-    imul ebx, [framebufferInfo+4]
-    imul ebx, [framebufferInfo+24]
-    shr ebx, 3
-    print_decimal rbx
-    print_ascii_value 10
+    heap_init ; init heap
+
+    heap_allocate rax ; int* rax = heap memory
+
+    push rax ; save pointer
+
+_loopsiloop:
+    mov rcx, 0x00FF0000 ; red
+    mov [rax], rcx ; set pixel to red
+    add rax, 8 ; jump to next pixel
+    dec rbx
+    jnz _loopsiloop
+
+    pop rax ; get base pointer of screenbuffer
+    file_write r15, rax, r10 ; r15 is fd | rax is screenbuffer | r10 is size.
+
+    file_close r15 ; close file.
 
     print_flush
 

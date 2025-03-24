@@ -60,17 +60,17 @@ _goNextHeader:
 
 _allocate:
 
-    movzx r8, byte [rbx] ; save the current free space
+    mov r8, [rbx] ; save the current free space
     ;   header* = N+1
     mov rdx, rax
     inc rdx
-    mov byte [rbx], dl
+    mov [rbx], rdx
     mov rcx, rbx ; ponter to header
     
     ;   footer = (header+N+16)*
     add rbx, rax
     add rbx, 8 
-    mov byte [rbx], dl 
+    mov [rbx], rdx 
 
     cmp r9, 1 ; check if any free space left
     je _skipFreeSpace
@@ -80,12 +80,12 @@ _allocate:
     mov rdx, rax ; space allocated
     add rdx, 16 ; header and footer
     sub r8, rdx ; calculate free space left
-    mov byte [rbx], r8b
+    mov [rbx], r8
 
     ; add free footer
     add rbx, r8
     add rbx, 8
-    mov byte [rbx], r8b
+    mov [rbx], r8
 
 
 _skipFreeSpace:

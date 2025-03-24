@@ -1,6 +1,7 @@
 program = test
 
-all: $(program) run clean
+# all: build run clean
+all: build
 
 build: $(program)
 
@@ -15,7 +16,7 @@ $(program).o: $(program).asm
 	@nasm -f elf64 -o $(program).o $(program).asm
 
 run: $(program)
-	@sudo ./$(program)
+	@./$(program)
 
 clean:
 	@rm -f $(program).o $(program)

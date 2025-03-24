@@ -1,14 +1,20 @@
 %ifndef HEAPINIT
 %define HEAPINIT
 
+; void heapInit(void)
+;   initialize the heap
 _heapInit:
-    mov rax, HEAP
+    push rax
 
-    mov byte [rax], HEAP_SIZE-16
+    mov rax, HEAP ; heap pointer
 
-    add rax, HEAP_SIZE
+    mov qword [rax], HEAP_SIZE-16 ; set header
 
-    mov byte [rax-8], HEAP_SIZE-16
+    add rax, HEAP_SIZE ; goto footer
+
+    mov qword [rax-8], HEAP_SIZE-16 ; set footer
+
+    pop rax
 
     ret
 
