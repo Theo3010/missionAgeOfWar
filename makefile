@@ -1,9 +1,9 @@
-program = test
+program = main
 
-# all: build run clean
-all: build
+all: build run clean
+# all: build
 
-build: $(program)
+build: clean $(program)
 
 back: program = back
 

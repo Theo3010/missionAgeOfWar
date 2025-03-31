@@ -4,7 +4,9 @@
 ; void memoryCopy(int* {rax}, int* {rbx}, int {rcx})
 ;   takes a pointer to memory in {rax} source and a pointer to memory in {rbx} destination and size of memory to copy in {rcx}
 _memoryCopy:
+    push rdx
 
+_memoryCopyLoop:
     mov rdx, 0
     ; take element from rax
     mov dl, byte [rax]
@@ -15,8 +17,9 @@ _memoryCopy:
     inc rbx ; move pointer
     ; dec rcx
     dec rcx
-    jnz _memoryCopy
+    jnz _memoryCopyLoop
 
+    pop rdx
     ret
 
 
@@ -26,13 +29,9 @@ _memoryCopy:
     push rbx
     push rcx
 
-    mov r8, %1
-    mov r9, %2
-    mov r10, %3
-
-    mov rax, r8
-    mov rbx, r9
-    mov rcx, r10
+    mov rax, %1
+    mov rbx, %2
+    mov rcx, %3
     call _memoryCopy
 
     pop rcx

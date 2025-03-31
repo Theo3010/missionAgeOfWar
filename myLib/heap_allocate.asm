@@ -3,7 +3,7 @@
 
 ; int* {rax} heap_allocate(int {rax})
     ;   return a int* to start of allocated memory in {rax}.
-    ;   int {rax} is the size of memory needed
+    ;   int {rax} is the size of memory needed. Has to be a multiple of 8
     ;   int {rax} -1 if failed to allocate
 _heapAllocate:
     push rbx
@@ -12,6 +12,25 @@ _heapAllocate:
     push r8
     push r9
 
+    ; size magic
+    push rax ; save rax
+    and rax, 15
+    cmp rax, 8
+    jle _eight
+
+    pop rax
+    shr rax, 4
+    shl rax, 4
+    add rax, 16
+    jmp _doneSizeMagic
+
+_eight:
+    pop rax
+    shr rax, 4
+    shl rax, 4
+    add rax, 8
+
+_doneSizeMagic:
     ; header = get_header(0)
     mov rbx, HEAP
     

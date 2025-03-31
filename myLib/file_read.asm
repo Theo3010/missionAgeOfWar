@@ -1,12 +1,14 @@
-; int {rax} file_read(file descriptor {rdi}, buffer {rsi}, length {rdx});
-;   return the number of read bytes
 
+; void file_read(file descriptor {rdi}, buffer {rsi}, length {rdx});
+;   reads file content
 _fileRead:
     push rax
+    push r11
 
     mov rax, 0 ; sys_read
     syscall
 
+    pop r11
     pop rax
 
     ret

@@ -32,8 +32,8 @@ _loopSleep:
     cmp rbx, rax
     jge _loopSleep
 
-    pop rbx
     pop rdx
+    pop rbx
 
     ret
 
