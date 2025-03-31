@@ -1,25 +1,23 @@
 %ifndef PRINT_HEX
 %define PRINT_HEX
 
-%include "myLib/print_ascii_value.asm"
+%include "lib/io/print_ascii_value.asm"
 
-; input:
-;   rax - number to be add to BUFFER
-; output:
-;   Adds number - in hex - to the BUFFER
+; void printHex(int {rax})
+;   prints the number in hexdecimal to the PRINT BUFFER
 _printHex:
-
     push rbx
     push rdi
     push rdx
 
     mov rbx, 0 ; counter
 
-    mov rdi, rax
-    mov rax, 48
+    ; show that the number is in hex (0x{number})
+    mov rdi, rax ; save number
+    mov rax, 48 ; 0
     call _printAsciiValue
 
-    mov rax, 120
+    mov rax, 120 ; x
     call _printAsciiValue
 
     mov rax, rdi
@@ -27,12 +25,12 @@ _printHex:
 _loopHex:
     mov rdx, rax
     
-    and rdx, 15
+    and rdx, 15 ; get the first hexdecimal digit
 
     add rdx, 48
-    cmp rdx, 58
+    cmp rdx, 58 ; 0-9
     jl _skip
-    add rdx, 39
+    add rdx, 39 ; a-f
 _skip:
 
     push rdx

@@ -1,9 +1,9 @@
 %ifndef HEAP_REALLOC
 %define HEAP_REALLOC
 
-%include "myLib/heap_allocate.asm"
-%include "myLib/heap_free.asm"
-%include "myLib/memory_copy.asm"
+%include "lib/mem/heap_allocate.asm"
+%include "lib/mem/heap_free.asm"
+%include "lib/mem/memory_copy.asm"
 
 ; int* {rax} heapRealloc(int* {rax}, int {rbx})
 ;   Takes a pointer to memory as input in {rax} and the new total size of memory in {rbx}
@@ -26,7 +26,8 @@ _heapRealloc:
     
     sub rcx, 8 ; return from header.
 
-    memory_copy rcx, rax, rdx ; copy memory from rcx to rax with length of rdx.
+    mov rbx, rax
+    memory_copy rcx, rbx, rdx ; copy memory from rcx to rax with length of rdx.
     
     ; free old memory
     heap_free rcx

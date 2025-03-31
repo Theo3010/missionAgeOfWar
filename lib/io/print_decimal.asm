@@ -1,13 +1,10 @@
 %ifndef PRINT_DECIMAL
 %define PRINT_DECIMAL
 
-%include "myLib/print_ascii_value.asm"
+%include "lib/io/print_ascii_value.asm"
 
-; input:
-;   rax number to be printed
-; output:
-;   add number to print buffer
-
+; void printDecimal(int {rax})
+;   prints the number in decimal to the PRINT BUFFER
 _printDecimal:
     push rax
     push rbx

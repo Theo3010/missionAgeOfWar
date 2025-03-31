@@ -1,4 +1,4 @@
-program = main
+program = test
 
 all: build run clean
 # all: build

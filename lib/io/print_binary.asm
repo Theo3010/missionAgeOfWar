@@ -1,5 +1,10 @@
-%include "myLib/print_ascii_value.asm"
+%ifndef PRINTBINARY
+%define PRINTBINARY
 
+%include "lib/io/print_ascii_value.asm"
+
+; void printBinary(int {rax})
+;   prints the number in binary to the PRINT BUFFER
 _printBinary:
     push rbx
     push rdx
@@ -9,10 +14,11 @@ _printBinary:
 
     mov rdi, rax
     
-    mov rax, 48
+    ; to show number in binary (0b{number})
+    mov rax, 48 ; 0
     call _printAsciiValue
 
-    mov rax, 98
+    mov rax, 98 ; b
     call _printAsciiValue
 
     mov rax, rdi
@@ -20,7 +26,7 @@ _printBinary:
 _loopBinary:
     mov rdx, rax
     
-    and rdx, 1
+    and rdx, 1 ; get first binary digit
 
     add rdx, 48
 
@@ -57,3 +63,6 @@ _loopBinaryAdd:
     pop rax
 
 %endmacro
+
+
+%endif

@@ -1,12 +1,10 @@
 %ifndef PRINT
 %define PRINT
 
-%include "myLib/print_ascii_value.asm"
+%include "lib/io/print_ascii_value.asm"
 
-; intput
-;   rax - msg to save to buffer
-; output
-;   
+; void print(char* {rax})
+;   takes a char pointer in {rax} and prints to PRINT BUFFER
 _print:
     push rdx
 
@@ -18,7 +16,7 @@ _printloop:
 
     push rax
     
-    movzx rax, dl
+    mov al, dl
     call _printAsciiValue
     
     pop rax

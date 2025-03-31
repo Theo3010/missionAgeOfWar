@@ -1,7 +1,10 @@
-%include "myLib/get_time.asm"
+%ifndef SLEEP
+%define SLEEP
 
-; input
-;   rax - microseconds to sleep
+%include "lib/get_time.asm"
+
+; void sleep(int {rax})
+;   waits AT LEAST {rax} microsecounds
 _sleep:
     ; clobbed
     push rbx
@@ -46,3 +49,5 @@ _loopSleep:
 
     pop rax
 %endmacro
+
+%endif

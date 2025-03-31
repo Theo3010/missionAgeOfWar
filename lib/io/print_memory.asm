@@ -1,8 +1,8 @@
 %ifndef PRINT_MEMORY
 %define PRINT_MEMORY
 
-%include "myLib/print_hex.asm"
-%include "myLib/print_ascii_value.asm"
+%include "lib/io/print_hex.asm"
+%include "lib/io/print_ascii_value.asm"
 
 ; void printMemory(int* {rax}, int {rbx}, int {rcx})
 ;   print the content at int* {rax} and the assostive address.
@@ -12,23 +12,23 @@ _printMemory:
     push rdx
     push r8
 
-    mov rdx, rbx
-    mov r8, rdx
+    mov rdx, rbx ; rows
+    mov r8, rdx ; rows
 
 _printMemoryLoopRow:
-    print_hex rax
-    print_ascii_value 58
-    print_ascii_value 32
+    print_hex rax ; address of memory
+    print_ascii_value 58 ; :
+    print_ascii_value 32 ; space
 _printMemoryLoopCol:
-    movzx rbx, byte [rax]
-    print_hex rbx
-    print_ascii_value 32
-    inc rax
-    dec rdx
+    movzx rbx, byte [rax] ; get first byte
+    print_hex rbx ; print memory
+    print_ascii_value 32 ; space
+    inc rax ; inc pointer
+    dec rdx ; dec row
     jnz _printMemoryLoopCol
-    mov rdx, r8
-    print_ascii_value 10
-    dec rcx
+    mov rdx, r8 ; reset row count
+    print_ascii_value 10 ; new line
+    dec rcx ; dec column
     jnz _printMemoryLoopRow
 
     pop r8
