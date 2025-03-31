@@ -10,3 +10,5 @@ _init:
     mov byte [screen_coordinates], 0
 
     raw_mode
+
+    ret

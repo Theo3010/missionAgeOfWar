@@ -1,24 +1,29 @@
 program = test
+srcFolder = src
+outFolder = out
 
 all: build run clean
-# all: build
 
-build: clean $(program)
+build: $(outFolder)/$(program)
 
-back: program = back
+back: $(outFolder)/back
 
-back: $(program)
+$(outFolder)/$(program): $(outFolder)/$(program).o
+	@ld -m elf_x86_64 $(outFolder)/$(program).o -o $(outFolder)/$(program)
 
-$(program): $(program).o
-	@ld -m elf_x86_64 $(program).o -o $(program)
+$(outFolder)/$(program).o: $(srcFolder)/$(program).asm
+	@nasm -f elf64 -o $(outFolder)/$(program).o $(srcFolder)/$(program).asm
 
-$(program).o: $(program).asm
-	@nasm -f elf64 -o $(program).o $(program).asm
+$(outFolder)/back: $(outFolder)/back.o
+	@ld -m elf_x86_64 $(outFolder)/back.o -o $(outFolder)/back
 
-run: $(program)
-	@./$(program)
+$(outFolder)/back.o: $(srcFolder)/back.asm
+	@nasm -f elf64 -o $(outFolder)/back.o $(srcFolder)/back.asm
+
+run: $(outFolder)/$(program)
+	@$(outFolder)/$(program)
 
 clean:
-	@rm -f $(program).o $(program)
+	@rm -f $(outFolder)/$(program).o $(outFolder)/$(program)
 
 .PHONY: all clean run back

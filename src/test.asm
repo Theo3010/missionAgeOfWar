@@ -71,8 +71,4 @@ section .text
 
 _start:
 
-    print_decimal 42
-    print_ascii_value 10
-    print_flush
-
     exit
