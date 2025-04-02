@@ -14,9 +14,9 @@ _render:
     draw_image r11, 0x10, 0x1dd, 0
 
     ; void drawImage(int* {rax}, int {rbx}, int {rcx}, int {r11})
-    draw_image r11, 0xf40, 0x1dd, 0
+    ; draw_image r11, 0xf40, 0x1dd, 0
 
-    draw_rect 0xff0, 0x100, 0xf00, 0xf00, 0xFF0000
+    draw_rect 230, 75, 30, 250
 
     ; camera = 0 then base = 0x10
     ; camera = 64 then

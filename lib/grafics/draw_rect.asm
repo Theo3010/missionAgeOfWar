@@ -1,64 +1,59 @@
 %ifndef DRAWRECT
 %define DRAWRECT
 
-; void drawRect(int {rax}, int {rbx}, int {rcx}, int {rdx}, {r8})
-;   draws a rect with offset {rax}x{rbx} size in {rcx}x{rdx}, with color {r8}
+; void drawRect(int {rax}, int{rdx}, int {rbx}, int {rcx})
+;   draws a rect with size {rbx}x{rcx}
 _drawRect:
 
-    push r9
-    push r10
+    push rbx
 
-    mov r9, [screen_Buffer_address]
-    
-    push rdx
-
-    ; shl rbx, 2
-    ; imul rbx, [fb_width]
-    add r9, rbx
-
+    shl rax, 2
+    push rdx ; mul cloober rdx
+    mul qword [fb_width]
     pop rdx
 
-    add r9, rax ; add offset
+    shl rdx, 2
+    add rax, rdx
 
-_drawRectLoopCol:
-    mov r10, rcx
-_drawRectLoopRow:
-    mov dword [r9], r8d ; write color
-    inc r9
-    dec r10 ; dec width
-    jnz _drawRectLoopRow
+    mov rbx, rax
+    mov rax, [screen_Buffer_address]
+    add rax, rbx
+
+    pop rbx
+
+    mov r8, rbx ; copy of row
+
+_drawRectLoop:
+    mov dword [rax], 0xFF0000
+    add rax, 4
+    dec rbx
+    jnz _drawRectLoop
     
-    sub r9, rcx ; goto start of square \r
-    add r9, [fb_width] ; goto next screen row. \n
+    ; \r
+    mov rbx, r8
+    shl rbx, 2
+    sub rax, rbx ; 
 
-    dec rdx ; dec height
-    jnz _drawRectLoopCol
+    ; \n
+    mov rbx, [fb_width]
+    shl rbx, 2
+    add rax, rbx
 
-    pop r10
-    pop r9
+    ; reset row count
+    mov rbx, r8
+
+    dec rcx
+    jnz _drawRectLoop
 
     ret
 
-%macro draw_rect 5
-    push rax
-    push rbx
-    push rcx
-    push rdx
-    push r8
+%macro draw_rect 4
 
     mov rax, %1
-    mov rbx, %2
-    mov rcx, %3
-    mov rdx, %4
-    mov r8, %5
+    mov rdx, %2
+    mov rbx, %3
+    mov rcx, %4
     call _drawRect
-
-    pop r8
-    pop rdx
-    pop rcx
-    pop rbx
-    pop rax
-
 %endmacro
 
 %endif
