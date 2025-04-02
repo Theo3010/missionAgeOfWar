@@ -1,3 +1,5 @@
+%ifndef FILEREAD
+%define FILEREAD
 
 ; void file_read(file descriptor {rdi}, buffer {rsi}, length {rdx});
 ;   reads file content
@@ -29,3 +31,5 @@ _fileRead:
     pop rdi
 
 %endmacro
+
+%endif

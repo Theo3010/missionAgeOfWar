@@ -1,10 +1,10 @@
-program = test
+program = main
 srcFolder = src
 outFolder = out
 
 all: build run clean
 
-build: $(outFolder)/$(program)
+build: clean $(outFolder)/$(program)
 
 back: $(outFolder)/back
 

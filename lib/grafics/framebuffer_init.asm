@@ -1,21 +1,24 @@
 %ifndef FRAMEBUFFER_INIT
 %define FRAMEBUFFER_INIT
 
+%include "lib/mem/heap_allocate.asm"
+%include "lib/mem/heap_free.asm"
+%include "lib/files/file_open.asm"
+
 ; void framebufferInit(void)
 ;   does stuff
 ;   expects heap to be init'ed.
 _framebufferInit:
-    
     
     ; allocate 1280
     heap_allocate 1280
     mov r10, rax ; save pointer
     
     ; open file /dev/fb0
-    file_open fbfileName, 2, 0644o
+    file_open .fbfileName, 2, 0644o
 
     ; save fd
-    mov [fb_file_descriptor], eax ; 4 bytes saved
+    mov [fb_file_descriptor], eax ; 8 bytes saved
 
     ; read /dev/fb0
     mov rdx, r10 ; load memory pointer
@@ -52,6 +55,8 @@ _framebufferInit:
     
     ret
 
+.fbfileName:
+    db "/dev/fb0", 0
 
 %macro framebuffer_init 0
 

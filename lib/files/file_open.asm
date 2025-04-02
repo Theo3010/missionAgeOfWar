@@ -1,3 +1,6 @@
+%ifndef FILEOPEN
+%define FILEOPEN
+
 ; fd {rax} fileOpen(char* {rdi}, int {rsi}, int {rdx})
 ;   takes a file name in {rdi}, flags in {rsi} and permissions in {rdx}.
 ;   returns a file descriptor
@@ -21,3 +24,6 @@ _fileOpen:
     pop rsi
     pop rdi
 %endmacro
+
+
+%endif

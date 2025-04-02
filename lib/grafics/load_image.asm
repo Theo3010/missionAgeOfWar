@@ -1,6 +1,15 @@
 %ifndef LOAD_IMAGE
 %define LOAD_IMAGE
 
+%include "lib/files/file_open.asm"
+%include "lib/files/file_read.asm"
+%include "lib/files/file_close.asm"
+
+%include "lib/io/print.asm"
+%include "lib/io/print_flush.asm"
+
+%include "lib/mem/heap_allocate.asm"
+
 ; int* {rax} loadImage(char* {rax})
 ;   take a filename in {rax} and load image
 ;   returns pointer to loaded image
@@ -38,9 +47,12 @@ _loadImage:
 
 
 _errorLoadingBmp:
-    print errorBmp
+    print .errorBmp
     print_flush
     ret
+
+.errorBmp:
+    db "The image file given, was not a BMP!", 10, 0
 
 %macro load_image 1
     mov rax, %1

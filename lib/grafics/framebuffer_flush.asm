@@ -1,6 +1,7 @@
 %ifndef FRMAEBUFFER_FLUSH
 %define FRMAEBUFFER_FLUSH
 
+%include "lib/files/file_write.asm"
 
 ; void framebufferFlush(void)
 ;   write screenbuffer (my buffer located on the heap) to the framebuffer (/dev/fb0).

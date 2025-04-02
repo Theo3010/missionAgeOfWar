@@ -13,7 +13,7 @@ _sleep:
     ; save input
     push rax
 
-    get_time
+    get_time time
 
     mov rax, [time]
     mov rdx, 1000000
@@ -25,7 +25,7 @@ _sleep:
 
 _loopSleep:
 
-    get_time
+    get_time time
 
     mov rax, [time]
     mov rdx, 1000000

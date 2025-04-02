@@ -2,16 +2,16 @@
 %ifndef GET_TIME
 %define GET_TIME
 
+; void getTime(int* {rdi})
+;   get the time from system and places it in {time}
 _getTime:
     push rax
-    push rdi
     push rsi
     ; sys clobbered
     push rcx
     push r11
 
     mov rax, 96          ; Syscall number for gettimeofday
-    mov rdi, time       ; Pointer to the struct timeval
     xor rsi, rsi         ; NULL timezone argument
     syscall   
 
@@ -19,15 +19,19 @@ _getTime:
     pop rcx
 
     pop rsi
-    pop rdi
     pop rax
 
 
     ret
 
 
-%macro get_time 0
+%macro get_time 1
+    push rdi
+
+    mov rdi, %1
     call _getTime
+
+    pop rdi
 %endmacro
 
 %endif
