@@ -2,7 +2,7 @@
 %define DRAWRECT
 
 ; void drawRect(int {rax}, int{rdx}, int {rbx}, int {rcx})
-;   draws a rect with size {rbx}x{rcx}
+;   draws a rect with offset {rax}x{rbx} and size {rbx}x{rcx}
 _drawRect:
 
     push rbx

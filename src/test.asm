@@ -35,11 +35,11 @@
 %include "lib/files/file_write.asm"
 %include "lib/files/file_close.asm"
 
-%include "lib/grafics/framebuffer_init.asm"
-%include "lib/grafics/framebuffer_fill.asm"
-%include "lib/grafics/framebuffer_flush.asm"
-%include "lib/grafics/load_image.asm"
-%include "lib/grafics/draw_image.asm"
+; %include "lib/grafics/framebuffer_init.asm"
+; %include "lib/grafics/framebuffer_fill.asm"
+; %include "lib/grafics/framebuffer_flush.asm"
+; %include "lib/grafics/load_image.asm"
+; %include "lib/grafics/draw_image.asm"
 
 
 section .data
@@ -70,5 +70,12 @@ section .text
 
 
 _start:
+
+    mov rax, 0
+    shl rax, 2
+
+    print_decimal rax
+
+    print_flush
 
     exit

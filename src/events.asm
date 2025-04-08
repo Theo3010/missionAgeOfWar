@@ -1,6 +1,7 @@
 %include "src/cleanup.asm"
 %include "lib/io/get_input.asm"
 
+
 _keyLisener:
     xor rax, rax
     mov [key], rax
@@ -24,6 +25,7 @@ _turnRight:
     jge _skipTurn
 
     add dword [camera_coordinates], 0x20
+
     ret
 
 _turnLeft:

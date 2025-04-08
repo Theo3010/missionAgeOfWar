@@ -5,12 +5,12 @@
 ;   return the lesser
 _min:
     cmp rax, rbx
-    jle _first
+    jle _Minfirst
 
     mov rax, rbx
     ret
 
-_first: 
+_Minfirst: 
     ret
 
 

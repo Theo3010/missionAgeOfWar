@@ -10,6 +10,9 @@ _printFlush:
     push rdi
     push rsi
 
+    ; sys clobbered
+    push r11
+
     ; print msg
     mov rax, 1
     mov rdi, 1
@@ -19,6 +22,8 @@ _printFlush:
 
     mov rax, 0
     mov [PRINT_BUFFER_LENGTH], rax
+
+    pop r11
 
     pop rsi
     pop rdi
