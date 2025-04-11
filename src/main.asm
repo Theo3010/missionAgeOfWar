@@ -9,7 +9,10 @@
 %include "lib/io/print_decimal.asm"
 %include "lib/io/print_array.asm"
 %include "lib/io/print.asm"
+%include "lib/io/print_registers.asm"
 %include "lib/io/get_input.asm"
+
+%include "lib/debug/save_registers.asm"
 
 %include "lib/files/file_open.asm"
 %include "lib/files/file_read.asm"
@@ -28,6 +31,7 @@
 %include "lib/terminal/raw_mode.asm"
 %include "lib/terminal/save_termois.asm"
 %include "lib/terminal/reset_termois.asm"
+%include "lib/terminal/move_ascii_cursor.asm"
 
 %include "lib/clock_tick.asm"
 %include "lib/exit.asm"
@@ -42,7 +46,12 @@ section .data
     base1 db "images/base1.bmp", 0
     PRINT_BUFFER_LENGTH dq 0
 
+    clear_screen db `\e[2J`, 0
+
 section .bss
+    debugMode resb 4
+    registers resb 120
+
     key resb 8
     
     clock_time resb 16
@@ -87,13 +96,36 @@ _start:
 _whileLoop:
     ;   events (key inputs)
     call _keyLisener
-    
+
+    cmp byte [debugMode], 1
+    je _mainDebugMode
+
     clock_tick 60 ; fps
     cmp rax, 0
     je _whileLoop ; no render
-
+    
+    save_registers
     call _render
 
     jmp _whileLoop
     
     exit
+
+
+_mainDebugMode:
+
+    clock_tick 1 ; fps
+    cmp rax, 0
+    je _whileLoop ; no print
+
+    reset_termois
+
+    move_ascii_cursor 2, 0
+    print clear_screen
+    print_registers
+
+    print_flush
+
+    raw_mode
+
+    jmp _whileLoop

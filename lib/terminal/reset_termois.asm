@@ -8,6 +8,14 @@
 ;	resets the terminal back the the terminal settings when save_termois as called.
 _resetRawMode:
 
+	push rax
+	push rdi
+	push rsi
+	push rdx
+
+	push rcx
+	push r11
+
 	; get old settings
 	mov rax, [oldTermois]
 	
@@ -21,6 +29,14 @@ _resetRawMode:
 	mov rsi, 0x5402
 	mov rdx, oldTermois
 	syscall
+
+	pop r11
+	pop rcx
+
+	pop rdx
+	pop rsi
+	pop rdi
+	pop rax
 
     ret
 

@@ -10,6 +10,8 @@
 %include "lib/io/print_array.asm"
 %include "lib/io/print_memory.asm"
 %include "lib/io/get_input.asm"
+%include "lib/io/print_registers.asm"
+
 
 %include "lib/mem/heap_init.asm"
 %include "lib/mem/heap_allocate.asm"
@@ -71,10 +73,7 @@ section .text
 
 _start:
 
-    mov rax, 0
-    shl rax, 2
-
-    print_decimal rax
+    print_registers
 
     print_flush
 

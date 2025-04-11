@@ -17,6 +17,9 @@ _keyLisener:
     cmp dword [key], 0x00445b1b  ; left
     je _turnLeft
 
+    cmp dword [key], 100 ; d -> debug
+    je _keyDebugMode
+
     ret
 
 _turnRight:
@@ -38,4 +41,8 @@ _turnLeft:
 _skipTurn:
     ret
 
+_keyDebugMode:
 
+    xor byte [debugMode], 1
+
+    ret

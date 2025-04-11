@@ -9,140 +9,148 @@
 %include "lib/io/print_flush.asm"
 %include "lib/sleep.asm"
 
-; void drawImage(int* {rax}, int {rbx}, int {rcx})
-;   pointer to load image {rax} and pixel coordinates where image should be draw in {rbx}x{rcx}
+; void drawImage(int* {r11}, int {rbx}, int{rcx})
 _drawImage:
+
+    push rax
+    push rdx
+    push r8
     push r9
     push r10
-    push r11
-    push r14
 
-    ; calculate pixel coordinates
     mov r10, [screen_Buffer_address]
-
-    ; height coordinate
+    
+    ; height offset
     shl rcx, 2
     imul rcx, [fb_width]
     add r10, rcx
 
+    ; width offset relative to camera
+    ; offset - camera
+    mov rax, rbx
+    sub rax, [camera_coordinates]
+
+    max rax, 0
+
     ; width offset
-    shl rbx, 2
-    add r10, rbx
+    shl rax, 2
+    add r10, rax
 
-    ; get total size of heap header
-    mov rcx, [rax-8]
-    sub rcx, 1 ; remove allocated flag
+    push rbx ; save width offset
 
-    push rbx ; save pos.x
-    ; get data offset
-    mov dword ebx, [rax]
+    ; read header
+    mov rcx, [r11-8]
+    sub rcx, 1 ; remove flags
+
+    ; get image header size
+    mov dword ebx, [r11] ; rbx = image header size
 
     ; get width size (2503)
-    mov dword edx, [rax+4]
+    mov dword edx, [r11+4] ; rdx = width of image
 
     ; get height size (800)
-    mov dword r8d, [rax+8]
+    mov dword r8d, [r11+8] ; r8 = height of image
 
-    ; goto data begin
-    add rax, rbx
+    ; get start of pixel array
+    add r11, rbx ; r11 = start of pixel array
 
-    ; get size of data only
+    ; get size of pixel array
     sub rcx, rbx
 
-    pop rbx ; load pos.x
+    ; go to end if image.
+    add r11, rcx
+    call _moveOneWidthPixels
 
-    ; make a bottom up copy.
-    add rax, rcx ; go to end of image
-    
-    mov r11, [camera_coordinates]
-    shl r11, 2
-    sub r11, rbx ; offset - pos.x
-    
-    push rax
-    max r11, 0 ; r11 >= 0
-    mov r11, rax
-    pop rax
-    
-    add rax, r11 ; background offset
+    pop rbx ; get back width offset.
 
-    shl rdx, 2
+    ; rax = endborder
+    mov rax, [fb_width] ; 1280 + 1000 = 2280
+    add rax, [camera_coordinates]
+    cmp rbx, rax ; offset > endborder then no draw
+    jge _noDraw
 
-    mov r9, [fb_width]
-    shl r9, 2
+    mov rcx, rdx
+    ; writing_length = writing_length - max((offset + image_width - endborder), 0)
+    mov r9, rbx
+    add r9, rdx
+    sub r9, rax
+    max r9, 0
 
-    sub rax, rdx ; go back one width
+    sub rcx, rax
 
-    mov r14, rax ; save rax
+    ; relative offset
+    mov rax, rbx
+    sub rax, [camera_coordinates]
 
-    ; check if image is out of screen.
-    mov rcx, rdx ; rcx = image_width
-    cmp r11, rcx
-    jge _drawImageEnd
+    cmp rax, 0
+    jg _writingLengthSkip
 
-    sub rcx, r11 ; rcx = image width - image offset
-    min rdx, rcx ; min (image_width, write_length)
+    mov rax, [camera_coordinates]
+    sub rax, rbx
+
+    ; writing_length - relative offset
+    sub rcx, rax
+
+    ; draw in relation to the camera
+    shl rax, 2
+    add r11, rax
+
+_writingLengthSkip:
+
+    cmp rcx, 0 ; if writing_length is less 0, no draw
+    jle _noDraw
+
+    min rcx, [fb_width]
     mov rcx, rax
-
-    min r9, rcx ; min(screen_width, image_write_length)
-    mov rcx, rax
-
-    mov rax, r14 ; load rax
 
 _drawImageLoop:
-    color_copy rax, r10, rcx
-    sub rax, rdx ; go back one width
-    add r10, r9 ; add one screene width, to goto next line
+    color_copy r11, r10, rcx ; copy first width of image
+    
+    call _moveOneWidthPixels ; go back one image width
+    mov rax, [fb_width]
+    shl rax, 2
+    add r10, rax ; add one screen width, to goto next line
+    
     dec r8
     jnz _drawImageLoop
 
-_drawImageEnd:
 
-    pop r14
-    pop r11
+_noDraw:
+    
     pop r10
     pop r9
+    pop r8
+    pop rdx
+    pop rax
 
     ret
 
 %macro draw_image 3
-    push rax
+
+    push r11
     push rbx
     push rcx
 
-    mov rax, %1
+    mov r11, %1
     mov rbx, %2
     mov rcx, %3
     call _drawImage
 
     pop rcx
     pop rbx
-    pop rax
+    pop r11
+
 %endmacro
 
+
+_moveOneWidthPixels:
+    push rdx
+    
+    shl rdx, 2
+    sub r11, rdx
+    
+    pop rdx
+    
+    ret
+
 %endif
-
-
-
-; unit.pos (x, y)
-; camera.x
-
-; drawimage unit.x, unit.y
-
-; start at (unit.x, unit.y) of screen
-; if unit.x = 40 and unit.y = 40, draw at frambuffer (40, 40)
-; camera shift 10 to the left (camera.x = 10)
-; if unit.x = 40 and unit.y = 40 and camera.x = 10, draw at framebuffer (30, 40)
-; if (0, y) or (x, 0), then no draw.
-
-; BUT lets draw an 40x40 image at (0, 0)
-; then move 10 (-10, 0), therefore no draw
-; but 30 of the 40 pixel is still visiable.
-
-; so 40x40 starting in (0, height) would be (0 (unit.x), 40(unit.width), height)
-; then move 10 would be (-10 (unit.x - [camera]), 30 (unit.width - [camera]), height)
-; if (<0, <0, height) then no draw
-; else -10 is current image offset and 30 is writing length.
-
-; and 40x40 starting in (120, height) would be (120, 120+40, height)
-; then move -10 would be (110, 150, height)
-

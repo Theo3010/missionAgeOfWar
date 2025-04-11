@@ -2,7 +2,7 @@
 %define COLORCOPY
 
 ; void _colorCopy(int* {rax}, int* {rbx}, int {rcx})
-;   takes a pointer to memory in {rax} source and a pointer to memory in {rbx} destination and size of memory to copy in {rcx}
+;   takes a pointer to memory in {rax} source and a pointer to memory in {rbx} destination and the number of pixels {rcx}
 _colorCopy:
     push rdx
     push r8
@@ -23,8 +23,7 @@ _colorCopyLoop:
 _colorCopySkip:
     add rbx, 4 ; move pointer
     
-    ; dec rcx
-    sub rcx, 4
+    dec rcx
     jnz _colorCopyLoop
 
     pop r8

@@ -32,6 +32,14 @@
 ;	set the terminal to raw mode (each key gets recived as a number and will not be shown in the terminal)
 _rawMode:
 
+	push rax
+	push rdi
+	push rsi
+	push rdx
+
+	push rcx
+	push r11
+
 	mov rax, [oldTermois]
 	
 	test rax, rax
@@ -52,6 +60,14 @@ _rawMode:
 	mov rsi, 0x5402
 	mov rdx, rawTermios
 	syscall
+
+	pop r11
+	pop rcx
+
+	pop rdx
+	pop rsi
+	pop rdi
+	pop rax
 
     ret
 

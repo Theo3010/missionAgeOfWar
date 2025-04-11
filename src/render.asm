@@ -8,15 +8,18 @@ _render:
     draw_image r9, 0, 0
     
     ; void drawImage(int* {rax}, int {rbx}, int {rcx})
-    draw_image r10, 0x120, 0x250
+    draw_image r10, 0x145, 0x250
 
     ; void drawImage(int* {rax}, int {rbx}, int {rcx})
     draw_image r11, 0x10, 0x1dd
 
     ; void drawImage(int* {rax}, int {rbx}, int {rcx})
-    ; draw_image r11, 0xf40, 0x1dd, 0
+    draw_image r11, 0x8a0, 0x1dd
 
-    mov rbx, 75
+    ; mov r13, [camera_coordinates]
+    ; save_registers
+
+    mov rbx, 120
     sub rbx, [camera_coordinates]
     cmp rbx, 0
     jle _skipRect
