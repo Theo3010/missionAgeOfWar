@@ -59,7 +59,12 @@ _drawImage:
 
     ; go to end if image.
     add r11, rcx
+    cmp r12, TRUE
+    ; je _drawImageFilped
+
     call _moveOneWidthPixels
+
+_drawImageFilped:
 
     pop rbx ; get back width offset.
 
@@ -104,10 +109,10 @@ _writingLengthSkip:
     mov rcx, rax
 
 _drawImageLoop:
-    color_copy r11, r10, rcx ; copy first width of image
+    color_copy r11, r10, rcx, r12 ; copy first width of image
     
     call _moveOneWidthPixels ; go back one image width
-    mov rax, [fb_width]
+    mov rax, [fb_width] 
     shl rax, 2
     add r10, rax ; add one screen width, to goto next line
     
@@ -125,7 +130,7 @@ _noDraw:
 
     ret
 
-%macro draw_image 3
+%macro draw_image 4
 
     push r11
     push rbx
@@ -134,6 +139,7 @@ _noDraw:
     mov r11, %1
     mov rbx, %2
     mov rcx, %3
+    mov r12, %4
     call _drawImage
 
     pop rcx

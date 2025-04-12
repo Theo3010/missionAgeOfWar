@@ -1,6 +1,8 @@
 ; defines
 %define PRINT_BUFFER_SIZE 1024
 %define HEAP_SIZE 0x2000000 ; ~ 32 MB
+%define FALSE 0
+%define TRUE 1
 
 ; includes
 %include "lib/io/print_flush.asm"

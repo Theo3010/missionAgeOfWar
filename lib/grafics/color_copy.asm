@@ -1,8 +1,8 @@
 %ifndef COLORCOPY
 %define COLORCOPY
 
-; void _colorCopy(int* {rax}, int* {rbx}, int {rcx})
-;   takes a pointer to memory in {rax} source and a pointer to memory in {rbx} destination and the number of pixels {rcx}
+; void _colorCopy(int* {rax}, int* {rbx}, int {rcx}, boolean {r12})
+;   takes a pointer to memory in {rax} source and a pointer to memory in {rbx} destination and the number of pixels {rcx}. fliped {r12}
 _colorCopy:
     push rdx
     push r8
@@ -10,7 +10,6 @@ _colorCopy:
 _colorCopyLoop:
     ; take element from rax
     mov edx, dword [rax]
-    add rax, 4 ; move pointer
 
     ; check alpha
     mov r8, rdx    
@@ -20,8 +19,9 @@ _colorCopyLoop:
 
     ; place ement at rbx
     mov dword [rbx], edx
+
 _colorCopySkip:
-    add rbx, 4 ; move pointer
+    call _movePointer ; move pointers
     
     dec rcx
     jnz _colorCopyLoop
@@ -30,7 +30,24 @@ _colorCopySkip:
     pop rdx
     ret
 
-%macro color_copy 3
+
+_movePointer:
+    add rbx, 4
+    
+    cmp r12, TRUE
+    je _flipedMove
+    
+    add rax, 4
+
+    ret
+
+_flipedMove:
+    sub rax, 4
+
+    ret
+
+
+%macro color_copy 4
     push rax
     push rbx
     push rcx
@@ -38,6 +55,7 @@ _colorCopySkip:
     mov rax, %1
     mov rbx, %2
     mov rcx, %3
+    mov r12, %4
     call _colorCopy
 
     pop rcx
