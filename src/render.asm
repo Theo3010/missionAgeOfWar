@@ -27,9 +27,9 @@ _render:
 ;     draw_rect 230, rbx, 30, 250
 
 ; _skipRect:
-    framebuffer_flush
+    ; framebuffer_flush
 
     ret
 
 .msg:
-    db "This is grafical text using a 8x8 font!", 0
+    db "T", 0

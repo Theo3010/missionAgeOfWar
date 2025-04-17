@@ -7,7 +7,7 @@ _printRegisters:
     push rbx
     push rcx
     push rdx
-    
+
     mov rbx, 0 ; count
 
 _printRegistersLoop:
@@ -25,7 +25,7 @@ _printRegistersLoop:
     inc rbx
     cmp rbx, 15
     jne _printRegistersLoop
-    
+
     pop rdx
     pop rcx
     pop rbx
@@ -50,6 +50,7 @@ _printRegistersLoop:
     db "r13: ", 0
     db "r14: ", 0
     db "r15: ", 0
+
 
 %macro print_registers 0
     call _printRegisters
