@@ -10,7 +10,7 @@
 %include "lib/io/print_array.asm"
 %include "lib/io/print_memory.asm"
 %include "lib/io/get_input.asm"
-%include "lib/io/print_registers.asm"
+; %include "lib/io/print_registers.asm"
 
 
 %include "lib/mem/heap_init.asm"
@@ -73,8 +73,23 @@ section .text
 
 _start:
 
-    print_registers
-
+    mov rax, _test
+    mov bl, byte [_test+2]
+    print_decimal rbx
+    print_ascii_value 10
     print_flush
 
     exit
+
+
+
+_test:
+
+.one:
+    db 1
+
+.two:
+    db 2
+
+.three:
+    db 3
