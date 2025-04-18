@@ -27,9 +27,9 @@ _render:
 ;     draw_rect 230, rbx, 30, 250
 
 ; _skipRect:
-    ; framebuffer_flush
+    framebuffer_flush
 
     ret
 
 .msg:
-    db "T", 0
+    db "abcdefghijklmnopqrstuvwxyz", 10, "ABCDEFGHIJKLMNOPQRSTUVWXYZ", 10, 34, "!#¤%&/()@£$€{[]}?-+*';:", 0

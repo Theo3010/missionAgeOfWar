@@ -4,7 +4,7 @@
 %include "lib/grafics/fonts.asm"
 %include "lib/grafics/text_copy.asm"
 
-; font size and font color
+%include "lib/io/print_binary.asm"
 
 ; void setText(char* {rax}, int {rbx}, int {rcx}, int {rdx}, int {r8})
 ;   pointer to text {rax} and // screen postion in {rbx}x{rcx}. Font size in {rdx} and font color (ARGB) in {r8}
@@ -17,10 +17,17 @@ _setText:
 
     ; get screen pointer
     mov r15, [screen_Buffer_address]
+
+    ; offset stuff
+
+
+    ; copy screen buffer
+    mov r14, r15 ; screen pointer
+
     ; default symbol or unknown symbol (symbol not in font)
-    mov rcx, _fonts.unknown
 
 _setTextLoop:
+    mov rcx, _fonts.unknown
     ; get char
     movzx rbx, byte [rax]
 
@@ -49,30 +56,58 @@ _setTextDrawChar:
     ; get char pointer from FONTS.asm
     mov rcx, _fonts ; pointer to the start of font (SPACE)
     
+    shl rbx, 3 ; rbx * 2^3 
     add rcx, rbx ; move pointer to char
 
 _unknown:
+    mov r9, 4
 
     ; copy mem from FONT to SCREEN_BUFFER (row based 8)
     mov r10, 8
 
-    ; save_registers
-    ; jmp _setTextReturn
+    push r14
 
+_setTextDrawCharMemLoopOuter:
+    mov r8, r9 ; copy of font size
 _setTextDrawCharMemLoop:
-    text_copy rcx, r15, 8, 16, 0x00FF0000
+    text_copy rcx, r14, 8, r9, 0x00FF00FF
     
-    add rcx, 8 ; go down line font width
-    add r15, [fb_width] ; go down one screen width
+    mov rbx, [fb_width]
+    shl rbx, 2
+    add r14, rbx ; go down one screen width
+
+    dec r8
+    jnz _setTextDrawCharMemLoop
+
+    inc rcx ; go down line font width
 
     dec r10
-    ; jnz _setTextDrawCharMemLoop
+    jnz _setTextDrawCharMemLoopOuter
 
+
+    pop r14
     ; repeat
-    inc rax
-    ; jmp _setTextLoop
+    mov r10, r9 ; font_size
+    shl r10, 3 ; font_size * 8
+    shl r10, 2 ; font_size * 8 * 4 (pixel convertion)
+    add r14, r10 ; move 'cursor' one char length
 
-_newline: ; TODO
+    inc rax
+    jmp _setTextLoop
+
+_newline:
+
+    mov r10, r9 ; font_size
+    shl r10, 3 ; font_size * 8
+    add r10, 2 ; add top botton padding
+    shl r10, 2 ; font_size * 8 * 4 (pixel convertion)
+    imul r10, [fb_width] ; font_size * 8 * 4 * width
+    add r15, r10 ; move 'cursor' one char length
+    mov r14, r15 ; screen pointer
+
+    inc rax
+    jmp _setTextLoop
+
 _setTextReturn:
 
     pop r15

@@ -3,7 +3,7 @@
 
 _fonts:
 
-.space:
+.space: ; 0x401b14
     db 0b00000000
     db 0b00000000
     db 0b00000000
@@ -13,7 +13,7 @@ _fonts:
     db 0b00000000
     db 0b00000000
 
-.exclamation_mark:
+.exclamation_mark: ; 0x401b1c
     db 0b00010000
     db 0b00010000
     db 0b00010000

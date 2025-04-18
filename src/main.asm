@@ -106,7 +106,6 @@ _whileLoop:
     cmp rax, 0
     je _whileLoop ; no render
     
-    save_registers
     call _render
 
     jmp _whileLoop
