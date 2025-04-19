@@ -4,22 +4,24 @@
 %include "lib/grafics/fonts.asm"
 %include "lib/grafics/text_copy.asm"
 
-%include "lib/io/print_binary.asm"
-
-; void setText(char* {rax}, int {rbx}, int {rcx}, int {rdx}, int {r8})
+; void setText(char* {rax}, int {rbx}, int {rcx}, int {r9}, int {r11})
 ;   pointer to text {rax} and // screen postion in {rbx}x{rcx}. Font size in {rdx} and font color (ARGB) in {r8}
 _setText:
 
-    push rbx
-    push rcx
     push r10
+    push r14
     push r15
 
     ; get screen pointer
     mov r15, [screen_Buffer_address]
 
     ; offset stuff
+    shl rcx, 1 ; rcx * 4 (do to pixel convertion)
+    imul rcx, [fb_width]
+    add r15, rcx
 
+    shl rbx, 2 ; rbx * 4 (do to pixel convertion)
+    add r15, rbx
 
     ; copy screen buffer
     mov r14, r15 ; screen pointer
@@ -60,17 +62,17 @@ _setTextDrawChar:
     add rcx, rbx ; move pointer to char
 
 _unknown:
-    mov r9, 4
-
     ; copy mem from FONT to SCREEN_BUFFER (row based 8)
-    mov r10, 8
+    mov r10, 8 ; font width
+    push r14 ; save screen pointer
 
-    push r14
-
+    ; outer loop for font scaling (in y-axis)
 _setTextDrawCharMemLoopOuter:
     mov r8, r9 ; copy of font size
+
+    ; main loop
 _setTextDrawCharMemLoop:
-    text_copy rcx, r14, 8, r9, 0x00FF00FF
+    text_copy rcx, r14, 8, r9, r11
     
     mov rbx, [fb_width]
     shl rbx, 2
@@ -111,19 +113,30 @@ _newline:
 _setTextReturn:
 
     pop r15
+    pop r14
     pop r10
-    pop rcx
-    pop rbx
 
     ret
 
 
-%macro set_text 1
+%macro set_text 5
     push rax
+    push rbx
+    push rcx
+    push r9
+    push r11
 
     mov rax, %1
+    mov rbx, %2
+    mov rcx, %3
+    mov r9, %4
+    mov r11, %5
     call _setText
 
+    pop r11
+    pop r9
+    pop rcx
+    pop rbx
     pop rax
 %endmacro
 

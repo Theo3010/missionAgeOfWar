@@ -132,9 +132,10 @@ _noDraw:
 
 %macro draw_image 4
 
-    push r11
     push rbx
     push rcx
+    push r11
+    push r12
 
     mov r11, %1
     mov rbx, %2
@@ -142,9 +143,10 @@ _noDraw:
     mov r12, %4
     call _drawImage
 
+    pop r12
+    pop r11
     pop rcx
     pop rbx
-    pop r11
 
 %endmacro
 

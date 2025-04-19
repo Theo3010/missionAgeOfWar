@@ -1,7 +1,6 @@
 %include "src/cleanup.asm"
 %include "lib/io/get_input.asm"
 
-
 _keyLisener:
     xor rax, rax
     mov [key], rax

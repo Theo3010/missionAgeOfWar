@@ -11,6 +11,7 @@
 %include "lib/io/print_decimal.asm"
 %include "lib/io/print_array.asm"
 %include "lib/io/print.asm"
+%include "lib/io/print_memory.asm"
 %include "lib/io/print_registers.asm"
 %include "lib/io/get_input.asm"
 
@@ -46,6 +47,7 @@ section .data
     background db "images/background.bmp", 0
     troop1 db "images/troop1.bmp", 0
     base1 db "images/base1.bmp", 0
+    mainMenu db "images/mainMenu.bmp", 0
     PRINT_BUFFER_LENGTH dq 0
 
     clear_screen db `\e[2J`, 0
@@ -74,7 +76,9 @@ section .bss
     PRINT_BUFFER resb PRINT_BUFFER_SIZE
     HEAP resb HEAP_SIZE
 
-    camera_coordinates resb 4
+    camera_coordinates resb 8
+
+    backgroundPointer resb 8
 
 section .text
     global _start
@@ -86,7 +90,7 @@ _start:
 
     ; int* {rax} loadImage(char* {rax})
     load_image background
-    mov r9, rax
+    mov qword [backgroundPointer], rax
 
     load_image troop1
     mov r10, rax
@@ -94,7 +98,9 @@ _start:
     load_image base1
     mov r11, rax
 
-    ; while (true)
+    load_image mainMenu ; ????????
+    mov r12, rax
+
 _whileLoop:
     ;   events (key inputs)
     call _keyLisener
@@ -106,11 +112,12 @@ _whileLoop:
     cmp rax, 0
     je _whileLoop ; no render
     
-    call _render
+    ; call _render
 
     jmp _whileLoop
     
-    exit
+
+    call _cleanAndExit
 
 
 _mainDebugMode:
@@ -130,3 +137,5 @@ _mainDebugMode:
     raw_mode
 
     jmp _whileLoop
+
+    ; call _cleanAndExit
