@@ -9,7 +9,8 @@
 %include "lib/io/print_flush.asm"
 %include "lib/sleep.asm"
 
-; void drawImage(int* {r11}, int {rbx}, int{rcx})
+; void drawImage(int* {r11}, int {rbx}, int {rcx}, int {r12})
+;   image, widthOffset, heightOffset, flags
 _drawImage:
 
     push rax
@@ -28,9 +29,14 @@ _drawImage:
     ; width offset relative to camera
     ; offset - camera
     mov rax, rbx
+
+    test r12, 0b10 ; stick flag
+    jnz _drawImageStick
     sub rax, [camera_coordinates]
 
     max rax, 0
+
+_drawImageStick:
 
     ; width offset
     shl rax, 2
@@ -60,7 +66,7 @@ _drawImage:
     ; go to end if image.
     add r11, rcx
     cmp r12, TRUE
-    ; je _drawImageFilped
+    je _drawImageFilped
 
     call _moveOneWidthPixels
 
@@ -68,13 +74,16 @@ _drawImageFilped:
 
     pop rbx ; get back width offset.
 
+    mov rcx, rdx
+    test r12, 0b10 ; stick flag
+    jnz _writingLengthSkip
+
     ; rax = endborder
     mov rax, [fb_width] ; 1280 + 1000 = 2280
     add rax, [camera_coordinates]
     cmp rbx, rax ; offset > endborder then no draw
     jge _noDraw
 
-    mov rcx, rdx
     ; writing_length = writing_length - max((offset + image_width - endborder), 0)
     mov r9, rbx
     add r9, rdx
@@ -108,6 +117,7 @@ _writingLengthSkip:
     min rcx, [fb_width]
     mov rcx, rax
 
+    and r12, 0b1 ; fliped falgs
 _drawImageLoop:
     color_copy r11, r10, rcx, r12 ; copy first width of image
     

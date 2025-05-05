@@ -6,8 +6,14 @@
 _fileClose:
     push rax
 
+    push rcx
+    push r11
+
     mov rax, 3
     syscall
+
+    pop r11
+    pop rcx
 
     pop rax
     ret

@@ -5,12 +5,16 @@
 ;   reads file content
 _fileRead:
     push rax
+    
+    push rcx
     push r11
 
     mov rax, 0 ; sys_read
     syscall
 
     pop r11
+    pop rcx
+    
     pop rax
 
     ret

@@ -24,6 +24,7 @@
 
 %include "lib/exit.asm"
 %include "lib/to_integer.asm"
+%include "lib/to_string.asm"
 %include "lib/get_time.asm"
 %include "lib/sleep.asm"
 
@@ -66,6 +67,7 @@ section .bss
 
     PRINT_BUFFER resb PRINT_BUFFER_SIZE
     HEAP resb HEAP_SIZE
+    STRINGBUFFER resb 24
 
 section .text
     global _start
@@ -73,23 +75,10 @@ section .text
 
 _start:
 
-    mov rax, _test
-    mov bl, byte [_test+2]
-    print_decimal rbx
+    to_string 9282
+    print rax
+
     print_ascii_value 10
     print_flush
 
     exit
-
-
-
-_test:
-
-.one:
-    db 1
-
-.two:
-    db 2
-
-.three:
-    db 3

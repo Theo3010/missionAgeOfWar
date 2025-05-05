@@ -23,7 +23,7 @@ _keyLisener:
 
 _turnRight:
 
-    cmp dword [camera_coordinates], 1223
+    cmp dword [camera_coordinates], 0x487
     jge _skipTurn
 
     add dword [camera_coordinates], 0x20
@@ -32,7 +32,7 @@ _turnRight:
 
 _turnLeft:
 
-    cmp dword [camera_coordinates], 0
+    cmp dword [camera_coordinates], 0x20
     jle _skipTurn
 
     sub dword [camera_coordinates], 0x20

@@ -38,6 +38,7 @@
 
 %include "lib/clock_tick.asm"
 %include "lib/exit.asm"
+%include "lib/to_string.asm"
 
 %include "src/events.asm"
 %include "src/render.asm"
@@ -47,7 +48,10 @@ section .data
     background db "images/background.bmp", 0
     troop1 db "images/troop1.bmp", 0
     base1 db "images/base1.bmp", 0
-    mainMenu db "images/mainMenu.bmp", 0
+    mainMenu db "images/mainmenu.bmp", 0
+    HUD db "images/HUD.bmp", 0
+    HUDresources db "images/HUDresources.bmp", 0
+    specialAblity1 db "images/specialAblity.bmp", 0
     PRINT_BUFFER_LENGTH dq 0
 
     clear_screen db `\e[2J`, 0
@@ -73,33 +77,52 @@ section .bss
 
     imageHeader resb 14
     
-    PRINT_BUFFER resb PRINT_BUFFER_SIZE
-    HEAP resb HEAP_SIZE
-
     camera_coordinates resb 8
 
     backgroundPointer resb 8
+    basePtr1 resb 8
+    HUDPtr resb 8
+    HUDresourcesPtr resb 8
+    mainMenuPtr resb 8
+    specialAblityPtr resb 8
+
+    PlayerExp resb 8
+    PlayerGold resb 8
+
+
+    PRINT_BUFFER resb PRINT_BUFFER_SIZE
+    HEAP resb HEAP_SIZE
+    STRINGBUFFER resb 24
 
 section .text
     global _start
 
 ; code
 _start:
-    
+
     call _init
 
     ; int* {rax} loadImage(char* {rax})
     load_image background
     mov qword [backgroundPointer], rax
 
+    load_image base1
+    mov qword [basePtr1], rax
+
+    load_image mainMenu
+    mov qword [mainMenuPtr], rax
+
+    load_image HUD
+    mov qword [HUDPtr], rax
+
+    load_image HUDresources
+    mov qword [HUDresourcesPtr], rax
+
+    load_image specialAblity1
+    mov qword [specialAblityPtr], rax
+
     load_image troop1
     mov r10, rax
-
-    load_image base1
-    mov r11, rax
-
-    load_image mainMenu ; ????????
-    mov r12, rax
 
 _whileLoop:
     ;   events (key inputs)
@@ -112,7 +135,7 @@ _whileLoop:
     cmp rax, 0
     je _whileLoop ; no render
     
-    ; call _render
+    call _render
 
     jmp _whileLoop
     

@@ -5,7 +5,7 @@
 %include "lib/grafics/text_copy.asm"
 
 ; void setText(char* {rax}, int {rbx}, int {rcx}, int {r9}, int {r11})
-;   pointer to text {rax} and // screen postion in {rbx}x{rcx}. Font size in {rdx} and font color (ARGB) in {r8}
+;   pointer to text {rax} and screen postion in {rbx}x{rcx}. Font size in {rdx} and font color (ARGB) in {r8}
 _setText:
 
     push r10
@@ -16,7 +16,7 @@ _setText:
     mov r15, [screen_Buffer_address]
 
     ; offset stuff
-    shl rcx, 1 ; rcx * 4 (do to pixel convertion)
+    shl rcx, 2 ; rcx * 4 (do to pixel convertion)
     imul rcx, [fb_width]
     add r15, rcx
 

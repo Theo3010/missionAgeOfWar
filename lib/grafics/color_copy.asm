@@ -12,9 +12,7 @@ _colorCopyLoop:
     mov edx, dword [rax]
 
     ; check alpha
-    mov r8, rdx    
-    and r8, 0xFF
-    cmp r8, 0
+    test edx, 0xFF000000
     je _colorCopySkip
 
     ; place ement at rbx

@@ -5,6 +5,6 @@
 
 _cleanAndExit:
     print_flush
-    ; framebuffer_flush
+    framebuffer_flush
     reset_termois
     exit

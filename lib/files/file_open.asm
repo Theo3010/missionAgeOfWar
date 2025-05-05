@@ -5,8 +5,14 @@
 ;   takes a file name in {rdi}, flags in {rsi} and permissions in {rdx}.
 ;   returns a file descriptor
 _fileOpen:
+    push rcx
+    push r11
+
     mov rax, 2
     syscall
+
+    pop r11
+    pop rcx
 
     ret
 

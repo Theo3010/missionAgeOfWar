@@ -1,10 +1,10 @@
 %ifndef HEAP_ALLOCATE
 %define HEAP_ALLOCATE
 
-; int* {rax} heap_allocate(int {rax})
-    ;   return a int* to start of allocated memory in {rax}.
-    ;   int {rax} is the size of memory needed. Has to be a multiple of 8
-    ;   int {rax} -1 if failed to allocate
+; void* {rax} heap_allocate(int {rax})
+    ;   return a void* to start of allocated memory in {rax}.
+    ;   int {rax} is the amount of bytes memory needed.
+    ;   int {rax} -1 if failed to allocate.
 _heapAllocate:
     push rbx
     push rcx
@@ -70,7 +70,7 @@ _goNextHeader:
     sub rcx, HEAP
     add rcx, 8
 
-    cmp rcx, HEAP_SIZE ; check out of memory footer
+    cmp rcx, HEAP_SIZE ; check out of memory
     je _errorHeap
     
     add rbx, 8 ; go to next header
