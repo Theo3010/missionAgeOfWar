@@ -58,12 +58,12 @@ _setTextDrawChar:
     ; get char pointer from FONTS.asm
     mov rcx, _fonts ; pointer to the start of font (SPACE)
     
-    shl rbx, 3 ; rbx * 2^3 
+    shl rbx, 3 ; rbx * 8 (2^3) due to each char is (8x8 bits) 
     add rcx, rbx ; move pointer to char
 
 _unknown:
     ; copy mem from FONT to SCREEN_BUFFER (row based 8)
-    mov r10, 8 ; font width
+    mov r10, 8 ; 8 counter for each chars bits
     push r14 ; save screen pointer
 
     ; outer loop for font scaling (in y-axis)
@@ -90,7 +90,7 @@ _setTextDrawCharMemLoop:
     pop r14
     ; repeat
     mov r10, r9 ; font_size
-    shl r10, 3 ; font_size * 8
+    imul r10, 6 ; font_size * 6 (6 line width, could be change to a function paramenter)
     shl r10, 2 ; font_size * 8 * 4 (pixel convertion)
     add r14, r10 ; move 'cursor' one char length
 

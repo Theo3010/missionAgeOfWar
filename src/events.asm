@@ -1,4 +1,5 @@
 %include "src/cleanup.asm"
+%include "src/menu.asm"
 %include "lib/io/get_input.asm"
 
 _keyLisener:
@@ -7,8 +8,17 @@ _keyLisener:
     
     get_input key, 4
 
-    cmp dword [key], 113 ; q -> quit
+    cmp dword [key], 27 ; esc -> quit
     je _cleanAndExit
+
+    cmp dword [key], 113 ; q -> menu left
+    je _menuLeft
+
+    cmp dword [key], 101 ; e -> menu right
+    je _menuRight
+
+    cmp dword [key], 32 ; space -> menu select
+    je _menuSelect
 
     cmp dword [key], 0x00435b1b  ; right
     je _turnRight

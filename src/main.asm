@@ -43,6 +43,7 @@
 %include "src/events.asm"
 %include "src/render.asm"
 %include "src/init.asm"
+
 ; section
 section .data
     background db "images/background.bmp", 0
@@ -52,6 +53,9 @@ section .data
     HUD db "images/HUD.bmp", 0
     HUDresources db "images/HUDresources.bmp", 0
     specialAblity1 db "images/specialAblity.bmp", 0
+    backMenuButton db "images/backMenuButton.bmp", 0
+    buttonHover db "images/buttonHover.bmp", 0
+    Age1Units db "images/Age1Units.bmp", 0
     PRINT_BUFFER_LENGTH dq 0
 
     clear_screen db `\e[2J`, 0
@@ -84,11 +88,19 @@ section .bss
     HUDPtr resb 8
     HUDresourcesPtr resb 8
     mainMenuPtr resb 8
+    backMenuButtonPtr resb 8
+    buttonHoverPtr resb 8
+    AgeUnitsPtr resb 8
     specialAblityPtr resb 8
 
     PlayerExp resb 8
     PlayerGold resb 8
-
+    PlayerAge resb 8
+    PlayerHealth resb 8
+    nextAgeExpRequirement resb 8
+    menuHover resb 8
+    menuSelected resb 8
+    HUDbuttonmsgPtr resb 8
 
     PRINT_BUFFER resb PRINT_BUFFER_SIZE
     HEAP resb HEAP_SIZE
@@ -121,6 +133,15 @@ _start:
     load_image specialAblity1
     mov qword [specialAblityPtr], rax
 
+    load_image backMenuButton
+    mov qword [backMenuButtonPtr], rax
+
+    load_image buttonHover
+    mov qword [buttonHoverPtr], rax
+
+    load_image Age1Units
+    mov qword [AgeUnitsPtr], rax
+
     load_image troop1
     mov r10, rax
 
@@ -134,12 +155,18 @@ _whileLoop:
     clock_tick 60 ; fps
     cmp rax, 0
     je _whileLoop ; no render
+
+    add qword [PlayerGold], 1
+    add qword [PlayerExp], 1
     
+    cmp qword [PlayerHealth], 0
+    jle _healthskip
+    sub qword [PlayerHealth], 1
+_healthskip:
     call _render
 
     jmp _whileLoop
     
-
     call _cleanAndExit
 
 
