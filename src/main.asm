@@ -26,6 +26,7 @@
 %include "lib/grafics/framebuffer_init.asm"
 %include "lib/grafics/framebuffer_fill.asm"
 %include "lib/grafics/framebuffer_flush.asm"
+%include "lib/grafics/multi_load_images.asm"
 
 %include "lib/mem/heap_init.asm"
 %include "lib/mem/heap_allocate.asm"
@@ -46,16 +47,7 @@
 
 ; section
 section .data
-    background db "images/background.bmp", 0
-    troop1 db "images/troop1.bmp", 0
-    base1 db "images/base1.bmp", 0
-    mainMenu db "images/mainmenu.bmp", 0
-    HUD db "images/HUD.bmp", 0
-    HUDresources db "images/HUDresources.bmp", 0
-    specialAblity1 db "images/specialAblity.bmp", 0
-    backMenuButton db "images/backMenuButton.bmp", 0
-    buttonHover db "images/buttonHover.bmp", 0
-    Age1Units db "images/Age1Units.bmp", 0
+    imagesPath db "../images/", 0
     PRINT_BUFFER_LENGTH dq 0
 
     clear_screen db `\e[2J`, 0
@@ -71,6 +63,8 @@ section .bss
 
     rawTermios resb 48
     oldTermois resb 48
+    
+    isTermoisSaved resb 2
 
     fb_file_descriptor resb 8
     fb_width resb 8
@@ -83,15 +77,9 @@ section .bss
     
     camera_coordinates resb 8
 
-    backgroundPointer resb 8
-    basePtr1 resb 8
-    HUDPtr resb 8
-    HUDresourcesPtr resb 8
-    mainMenuPtr resb 8
-    backMenuButtonPtr resb 8
-    buttonHoverPtr resb 8
-    AgeUnitsPtr resb 8
-    specialAblityPtr resb 8
+    imagesPointer resb 8
+
+    FolderInfoBuffer resb 4096
 
     PlayerExp resb 8
     PlayerGold resb 8
@@ -114,36 +102,8 @@ _start:
 
     call _init
 
-    ; int* {rax} loadImage(char* {rax})
-    load_image background
-    mov qword [backgroundPointer], rax
-
-    load_image base1
-    mov qword [basePtr1], rax
-
-    load_image mainMenu
-    mov qword [mainMenuPtr], rax
-
-    load_image HUD
-    mov qword [HUDPtr], rax
-
-    load_image HUDresources
-    mov qword [HUDresourcesPtr], rax
-
-    load_image specialAblity1
-    mov qword [specialAblityPtr], rax
-
-    load_image backMenuButton
-    mov qword [backMenuButtonPtr], rax
-
-    load_image buttonHover
-    mov qword [buttonHoverPtr], rax
-
-    load_image Age1Units
-    mov qword [AgeUnitsPtr], rax
-
-    load_image troop1
-    mov r10, rax
+    multi_load_images imagesPath
+    mov qword [imagesPointer], rax ; save pointer to images
 
 _whileLoop:
     ;   events (key inputs)
@@ -159,10 +119,6 @@ _whileLoop:
     add qword [PlayerGold], 1
     add qword [PlayerExp], 1
     
-    cmp qword [PlayerHealth], 0
-    jle _healthskip
-    sub qword [PlayerHealth], 1
-_healthskip:
     call _render
 
     jmp _whileLoop

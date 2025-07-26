@@ -1,6 +1,8 @@
 %ifndef HEAP_ALLOCATE
 %define HEAP_ALLOCATE
 
+%include "lib/error.asm"
+
 ; void* {rax} heap_allocate(int {rax})
     ;   return a void* to start of allocated memory in {rax}.
     ;   int {rax} is the amount of bytes memory needed.
@@ -13,21 +15,24 @@ _heapAllocate:
     push r9
 
     ; size magic
-    push rax ; save rax
+    mov rbx, rax
+    test rax, 15
+    jz _doneSizeMagic
+
     and rax, 15
     cmp rax, 8
     jle _eight
 
-    pop rax
+    mov rax, rbx
     shr rax, 4
     shl rax, 4
     add rax, 16
     jmp _doneSizeMagic
 
 _eight:
-    pop rax
-    shr rax, 4
-    shl rax, 4
+    mov rax, rbx
+    shr rax, 3
+    shl rax, 3
     add rax, 8
 
 _doneSizeMagic:
@@ -117,7 +122,12 @@ _skipFreeSpace:
     jmp _doneHeap
 
 _errorHeap:
+    throw_error .errorHeapMsg
     mov rax, -1
+
+
+.errorHeapMsg:
+    db "ERROR: Heap error. Remember to call 'heap_init' before any use of heap", 0
 
 _doneHeap:
     pop r9

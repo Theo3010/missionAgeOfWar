@@ -41,8 +41,9 @@ _rawMode:
 	push r11
 
 	mov rax, [oldTermois]
-	
-	test rax, rax
+
+	mov bl, byte [isTermoisSaved]
+	test bl, bl
 	jz _failRawMode
 
 	; copy base termois
@@ -80,7 +81,7 @@ _failRawMode:
 
 
 .failMsg:
-	db "You need first save termios!", 10, 0
+	db "SaveError: You need first save termios before calling 'raw_mode'", 10, 0
 
 
 %macro raw_mode 0

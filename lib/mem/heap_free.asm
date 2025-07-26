@@ -9,6 +9,7 @@ _heapFree:
     push rbx
     push rcx
     push rdx
+    push r10
 
     ; get header
     sub rax, 8
@@ -67,6 +68,7 @@ _skipMemoryAdd:
     mov [rax], rbx
 
 
+    pop r10
     pop rdx
     pop rcx
     pop rbx

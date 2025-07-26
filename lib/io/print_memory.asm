@@ -4,8 +4,8 @@
 %include "lib/io/print_hex.asm"
 %include "lib/io/print_ascii_value.asm"
 
-; void printMemory(int* {rax}, int {rbx}, int {rcx})
-;   print the content at int* {rax} and the assostive address.
+; void printMemory(void* {rax}, int {rbx}, int {rcx})
+;   print the content at void* {rax} and the assostive address.
 ;   int {rbx} is the rows of memory
 ;   int {rcx} is the colums of memory
 _printMemory:

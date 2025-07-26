@@ -41,3 +41,6 @@ core
 *.swo
 .DS_Store
 Thumbs.db
+
+# Ignore python support files not revelent to the project
+*.py

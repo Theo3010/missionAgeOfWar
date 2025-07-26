@@ -5,11 +5,16 @@
 %include "lib/to_string.asm"
 
 _render:
+    push r10
+
     ; void framebufferFill(int {rcx})
     framebuffer_fill 0x0 ; black
+    
+    ; load images pointer
+    mov r10, [imagesPointer] ; get pointer to images
 
     ; background
-    draw_image [backgroundPointer], 0, 0, 0b0 ; image, widthOffset, heightOffset, fliped
+    draw_image [r10 + 8 * 0], 0, 0, 0b0 ; image, widthOffset, heightOffset, fliped
 
     ; draw base
     call _drawBase
@@ -22,12 +27,14 @@ _render:
 
     framebuffer_flush
 
+    pop r10
+
     ret
 
 _drawBase:
 
     ; base 1
-    draw_image [basePtr1], 0x10, 0x1dd, 0b0
+    draw_image [r10 + 8 * 1], 0x10, 0x1dd, 0b0
     
     ; player health
     draw_rect 0x23, 188, 28, 253, 0x0, 0
@@ -47,13 +54,13 @@ _drawBase:
     set_text rax, 0x45, 205, 2, 0x00FF0000
     
     ; base 2
-    draw_image [basePtr1], 0x8a0, 0x1dd, 0b1
+    draw_image [r10 + 8 * 1], 0x8a0, 0x1dd, 0b1
 
     ret
 
 _drawTroops:
 
-    draw_image r10, 0x170, 0x250, 0
+    draw_image [r10 + 8 * 7], 0x170, 0x250, 0
 
     ret
 
@@ -61,10 +68,10 @@ _drawTroops:
 _drawHUD:
     
     ; background HUD
-    draw_image [HUDPtr], 840, 0x0, 0b10
+    draw_image [r10 + 8 * 2], 840, 0x0, 0b10
 
     ; resources HUD
-    draw_image [HUDresourcesPtr], 0, 0, 0b10
+    draw_image [r10 + 8 * 3], 0, 0, 0b10
 
     to_string [PlayerGold]
     set_text rax, 30, 16, 3, 0x00FFFF00
@@ -79,16 +86,26 @@ _drawHUD:
     cmp byte [menuSelected], 1
     je _unitsMenu
 
-    draw_image [mainMenuPtr], 900, 40, 0b10
+    cmp byte [menuSelected], 2
+    je _turretsMenu
 
-    jmp _unitsMenuSkip
+    draw_image [r10 + 8 * 4], 900, 40, 0b10
+
+    jmp _subMenuSkip
 
 _unitsMenu:
-    draw_image [backMenuButtonPtr], 1185, 40, 0b10
+    draw_image [r10 + 8 * 9], 1185, 40, 0b10
 
-    draw_image [AgeUnitsPtr], 900, 40, 0b10
+    draw_image [r10 + 8 * 6], 900, 40, 0b10
 
-_unitsMenuSkip:
+    jmp _subMenuSkip
+
+_turretsMenu:
+    draw_image [r10 + 8 * 9], 1185, 40, 0b10
+
+    draw_image [r10 + 8 * 5], 900, 40, 0b10
+
+_subMenuSkip:
     mov rbx, [menuHover] 
     cmp rbx, 3
     jne _menuNotSkipThree
@@ -107,8 +124,10 @@ _menuNotSkipThree:
     imul rbx, 73
     add rax, rbx
 
-    draw_image [buttonHoverPtr], rax, 36, 0b10
+    draw_image [r10 + 8 * 8], rax, 36, 0b10
 
+
+    ; menu text
     set_text _renderConst.MainMenuMsg, 900, 10, 3, 0x00FFFF00
 
     set_text [HUDbuttonmsgPtr], 215, 65, 2, 0x00FFFF00
@@ -127,8 +146,7 @@ _menuNotSkipThree:
     ; special abilty
     set_text _renderConst.specialAbiltyMsg, 1055, 133, 2, 0x00FFFF00
 
-    draw_image [specialAblityPtr], 1185, 125, 0b10 ;
-
+    draw_image [r10 + 8 * 10], 1185, 125, 0b10 ;
 
     ret
 

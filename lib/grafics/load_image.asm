@@ -7,23 +7,31 @@
 
 %include "lib/io/print.asm"
 %include "lib/io/print_flush.asm"
-
+%include "lib/io/string_concat.asm"
 %include "lib/mem/heap_allocate.asm"
 
-; int* {rax} loadImage(char* {rax})
+; void* {rax} loadImage(char* {rax})
 ;   take a filename in {rax} and load image
 ;   returns pointer to loaded image
 _loadImage:
     push rbx
     push r10
 
+    ; debug load_image
+    ; print rax
+    ; print_ascii_value 10
+    ; print_flush
+
     file_open rax, 0, 0644o ; open file
     mov r10, rax ; save fd
+
+    xor rax, rax ; clear rax
+    mov [imageHeader], rax
 
     file_read r10, imageHeader, 14 ; image header
 
     mov word ax, [imageHeader] ; get file type
-    
+
     cmp ax, 0x4d42 ; check if bmp file
     jne _errorLoadingBmp
 

@@ -23,7 +23,6 @@ _memoryCopyLoop:
     ret
 
 
-; TODO: this can be optimized, no need for 6 registers
 %macro memory_copy 3
     push rax
     push rbx
