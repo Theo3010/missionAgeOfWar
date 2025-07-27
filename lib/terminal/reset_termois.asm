@@ -8,11 +8,9 @@
 ;	resets the terminal back the the terminal settings when save_termois as called.
 _resetRawMode:
 
-	; get old settings
-	mov rax, [oldTermois]
-	
 	; test if the setting was saved
-	test rax, rax
+	mov al, byte [isTermoisSaved]
+	test al, al
 	jz _failReset
 
 	push rdi

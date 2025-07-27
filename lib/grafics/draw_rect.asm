@@ -9,16 +9,21 @@ _drawRect:
     push r9
     push r10
 
+    ; 
+    
     push rdx ; mul cloober rdx
-    shl rax, 2
+    shl rax, 2 ; pixel conversion
     mul qword [fb_width]
     pop rdx
+    
+    mov r8, 
+    sub rdx, [camera_coordinates] ; camera offset
 
-    shl rdx, 2
+    shl rdx, 2 ; pixel conversion
     add rax, rdx
 
     add rax, [screen_Buffer_address]
-
+    
     mov r8, rbx ; copy of row
     mov r9, 0 ; counter
     mov r10, rcx ; height invariant
@@ -89,6 +94,7 @@ _drawRectSkip:
     push rcx
     push rdx
     push r11
+    push r12
 
     mov rdx, %1
     mov rax, %2
@@ -98,6 +104,7 @@ _drawRectSkip:
     mov r12, %6
     call _drawRect
 
+    pop r12
     pop r11
     pop rdx
     pop rcx

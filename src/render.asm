@@ -19,11 +19,11 @@ _render:
     ; draw base
     call _drawBase
 
-    ; draw trops
-    call _drawTroops
+    ; ; draw trops
+    ; call _drawTroops
 
-    ; draw menu
-    call _drawHUD
+    ; ; draw menu
+    ; call _drawHUD
 
     framebuffer_flush
 
@@ -37,7 +37,7 @@ _drawBase:
     draw_image [r10 + 8 * 1], 0x10, 0x1dd, 0b0
     
     ; player health
-    draw_rect 0x23, 188, 28, 253, 0x0, 0
+    draw_rect 0x23, 188, 28, 253, 0x0, 0 ; player health background
     
     mov rcx, [PlayerHealth]
     shr rcx, 1 
@@ -48,9 +48,9 @@ _drawBase:
     sub rax, rcx ; 250 - current health
     add rax, 190
     
-    draw_rect 0x25, rax, 25, rcx, 0x00FF0000, 0 
+    draw_rect 0x50, rax, 25, rcx, 0x00FF0000, 0b0 ; player health bar
 
-    to_string [PlayerHealth]
+    to_string [PlayerHealth] ; uses the string buffer (a tempary place for strings), NOT the heap (no need for free.)
     set_text rax, 0x45, 205, 2, 0x00FF0000
     
     ; base 2

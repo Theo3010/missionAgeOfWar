@@ -65,7 +65,7 @@ _drawImageStick:
 
     ; go to end if image.
     add r11, rcx
-    cmp r12, TRUE
+    cmp r12, 0b1 ; fliped flag
     je _drawImageFilped
 
     call _moveOneWidthPixels
