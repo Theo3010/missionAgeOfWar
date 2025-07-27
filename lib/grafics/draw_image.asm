@@ -34,7 +34,7 @@ _drawImage:
     jnz _drawImageStick
     sub rax, [camera_coordinates]
 
-    max rax, 0
+    max rax, 0 ; rax is always >= 0
 
 _drawImageStick:
 

@@ -90,6 +90,8 @@ section .bss
     menuSelected resb 8
     HUDbuttonmsgPtr resb 8
 
+    EnemyHealth resb 8
+
     PRINT_BUFFER resb PRINT_BUFFER_SIZE
     HEAP resb HEAP_SIZE
     STRINGBUFFER resb 24

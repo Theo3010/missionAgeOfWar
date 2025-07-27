@@ -9,16 +9,54 @@ _drawRect:
     push r9
     push r10
 
-    ; 
     
     push rdx ; mul cloober rdx
     shl rax, 2 ; pixel conversion
     mul qword [fb_width]
     pop rdx
     
-    mov r8, 
-    sub rdx, [camera_coordinates] ; camera offset
+    test r12, 0b10
+    je _drawRectCameraSkip
+    ; convert to camera relative cordiantes
+    
+    mov r8, rax ; save height offset
 
+    mov r10, rdx
+    sub rdx, [camera_coordinates] ; width camera offset
+    max rdx, 0
+    mov rdx, rax
+
+    ; rax = endborder
+    mov rax, [fb_width] ; 1280 + 1000 = 2280
+    add rax, [camera_coordinates]
+    cmp rdx, rax ; offset > endborder then no draw
+    jge _drawRectNoDraw
+
+    ; writing_length (right side correction) = writing_length - max((offset + image_width - endborder), 0)
+    mov r9, r10
+    add r9, rbx
+    sub r9, rax
+    max r9, 0
+
+    sub rbx, rax
+
+    ; writing_length (left side correction)
+    mov rax, [camera_coordinates]
+    sub rax, r10
+
+    mov r9, 0
+    cmp rdx, 0 ; if width offset is > 0, then no change
+    cmovg rax, r9
+
+    sub rbx, rax
+
+    cmp rbx, 0
+    jle _drawRectNoDraw
+
+_drawRectCameraSkip:
+
+    mov rax, r8
+    
     shl rdx, 2 ; pixel conversion
     add rax, rdx
 
@@ -30,8 +68,8 @@ _drawRect:
     sub r10, 1
 
 _drawRectLoop:
-    cmp r12, 1
-    jne _drawRectBase
+    test r12, 0b01
+    je _drawRectBase
 
     cmp r9, 0
     je _drawRectBase
@@ -80,6 +118,8 @@ _drawRectSkip:
 
     dec rcx
     jnz _drawRectLoop
+
+_drawRectNoDraw:
 
     pop r10
     pop r9

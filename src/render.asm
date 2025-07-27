@@ -19,10 +19,10 @@ _render:
     ; draw base
     call _drawBase
 
-    ; ; draw trops
+    ; draw trops
     ; call _drawTroops
 
-    ; ; draw menu
+    ; draw menu
     ; call _drawHUD
 
     framebuffer_flush
@@ -37,7 +37,7 @@ _drawBase:
     draw_image [r10 + 8 * 1], 0x10, 0x1dd, 0b0
     
     ; player health
-    draw_rect 0x23, 188, 28, 253, 0x0, 0 ; player health background
+    draw_rect 0x4e, 188, 28, 253, 0x0, 0b10 ; player health background
     
     mov rcx, [PlayerHealth]
     shr rcx, 1 
@@ -48,13 +48,25 @@ _drawBase:
     sub rax, rcx ; 250 - current health
     add rax, 190
     
-    draw_rect 0x50, rax, 25, rcx, 0x00FF0000, 0b0 ; player health bar
+    draw_rect 0x50, rax, 25, rcx, 0x00FF0000, 0b10 ; player health bar
 
     to_string [PlayerHealth] ; uses the string buffer (a tempary place for strings), NOT the heap (no need for free.)
     set_text rax, 0x45, 205, 2, 0x00FF0000
     
     ; base 2
     draw_image [r10 + 8 * 1], 0x8a0, 0x1dd, 0b1
+
+    mov rcx, [EnemyHealth]
+    shr rcx, 1 
+    mov rdx, 1
+    cmp rcx, 0
+    cmovle rcx, rdx 
+    mov rax, 250
+    sub rax, rcx ; 250 - current health
+    add rax, 190
+
+    draw_rect 0x8ee, 188, 28, 253, 0x0, 0b10 ; player health background
+    draw_rect 0x8f0, rax, 25, rcx, 0x00FF0000, 0b10 ; enemy health bar
 
     ret
 
@@ -133,14 +145,14 @@ _menuNotSkipThree:
     set_text [HUDbuttonmsgPtr], 215, 65, 2, 0x00FFFF00
 
     ; units queue
-    draw_rect 210, 15, 460, 10, 0x0, 1
+    draw_rect 210, 15, 460, 10, 0x0, 0b1
 
-    draw_rect 690, 10, 20, 20, 0xc4c4c4, 0 
-    draw_rect 690, 10, 20, 20, 0x0, 1 
-    draw_rect 720, 10, 20, 20, 0x0, 1 
-    draw_rect 750, 10, 20, 20, 0x0, 1 
-    draw_rect 780, 10, 20, 20, 0x0, 1 
-    draw_rect 810, 10, 20, 20, 0x0, 1 
+    draw_rect 690, 10, 20, 20, 0xc4c4c4, 0b0 
+    draw_rect 690, 10, 20, 20, 0x0, 0b1
+    draw_rect 720, 10, 20, 20, 0x0, 0b1 
+    draw_rect 750, 10, 20, 20, 0x0, 0b1 
+    draw_rect 780, 10, 20, 20, 0x0, 0b1 
+    draw_rect 810, 10, 20, 20, 0x0, 0b1 
 
 
     ; special abilty
