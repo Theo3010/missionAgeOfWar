@@ -3,18 +3,49 @@
 
 %include "lib/grafics/fonts.asm"
 %include "lib/grafics/text_copy.asm"
+%include "lib/io/string_length.asm"
 
 ; void setText(char* {rax}, int {rbx}, int {rcx}, int {r9}, int {r11})
-;   pointer to text {rax} and screen postion in {rbx}x{rcx}. Font size in {rdx} and font color (ARGB) in {r8}
+;   pointer to text {rax} and screen postion in {rbx}x{rcx}. Font size in {r9} and font color (ARGB) in {r11} and flags in {r12}
 _setText:
 
     push r10
     push r14
     push r15
 
-    ; get screen pointer
     mov r15, [screen_Buffer_address]
+    mov r14, rax ; save text pointer
 
+    test r12, 0b1
+    je _drawTextCameraSkip
+    ; convert to camera relative cordiantes
+
+    ; rax = endborder
+    string_length rax
+    mov r10, rax
+    shl r10, 3 ; rax * 8 (due to each char is 8 pixels wide)
+    imul r10, r9 ; rax * 8 * font_size (font size in pixels)
+    add r10, rbx ; add text offset
+
+    mov rax, [fb_width] ; width of screen
+    add rax, [camera_coordinates] ; add camera offset
+    cmp r10, rax ; offset + text width > endborder then no draw
+    jge _setTextReturn
+
+    ; rax = start
+    mov rax, [camera_coordinates]
+    sub rax, 0x20 ; start camera correction
+    cmp rbx, rax ; offset < endborder then no draw
+    jle _setTextReturn
+
+    mov r10, rbx
+    sub rbx, [camera_coordinates] ; width camera offset
+    max rbx, 0
+    mov rbx, rax
+
+_drawTextCameraSkip:
+
+    mov rax, r14 ; load text pointer
     ; offset stuff
     shl rcx, 2 ; rcx * 4 (do to pixel convertion)
     imul rcx, [fb_width]
@@ -119,20 +150,23 @@ _setTextReturn:
     ret
 
 
-%macro set_text 5
+%macro set_text 6
     push rax
     push rbx
     push rcx
     push r9
     push r11
+    push r12
 
     mov rax, %1
     mov rbx, %2
     mov rcx, %3
     mov r9, %4
     mov r11, %5
+    mov r12, %6
     call _setText
 
+    pop r12
     pop r11
     pop r9
     pop rcx

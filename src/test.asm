@@ -34,6 +34,8 @@
 %include "lib/error.asm"
 %include "lib/queue.asm"
 %include "lib/nextzero.asm"
+%include "lib/clock_tick.asm"
+%include "lib/world_cords.asm"
 
 %include "lib/terminal/move_ascii_cursor.asm"
 %include "lib/terminal/raw_mode.asm"
@@ -56,6 +58,8 @@
 
 %include "lib/debug/save_registers.asm"
 
+%include "src/events.asm"
+
 
 section .data
     imagesPath db "../images/", 0
@@ -66,11 +70,14 @@ section .data
 
 section .bss
     registers resb 120
+    debugMode resb 4
 
     key resb 4
     imageHeader resb 14
+    
+    clock_time resb 16
     time resb 16
-
+    
     oldTermois resb 48
     rawTermios resb 48
     isTermoisSaved resb 4
@@ -88,6 +95,16 @@ section .bss
     camera_coordinates resb 8
     imagesPointer resb 8
 
+    PlayerExp resb 8
+    PlayerGold resb 8
+    PlayerAge resb 8
+    PlayerHealth resb 8
+    nextAgeExpRequirement resb 8
+    menuHover resb 8
+    menuSelected resb 8
+    HUDbuttonmsgPtr resb 8
+
+
     FolderInfoBuffer resb 4096
 
 section .text
@@ -103,6 +120,18 @@ _startprintloop:
 
     ret
 
+_startTestRender:
+    framebuffer_fill 0x000000 ; clear framebuffer
+    
+    mov r10, [imagesPointer] ; get pointer to images
+
+    word_cords 0x4e, 28 ; get world cords for offset 0 and width 100
+    draw_rect rax, 188, rbx, 253, 0x0, 0 ; player health background
+
+    framebuffer_flush
+
+    ret
+
 _start:
 
     heap_init
@@ -111,10 +140,20 @@ _start:
 
     multi_load_images imagesPath
     mov qword [imagesPointer], rax
-    
 
 
-    framebuffer_flush
+_whileLoop:
+    ;   events (key inputs)
+    call _keyLisener
+
+    clock_tick 60 ; fps
+    cmp rax, 0
+    je _whileLoop ; no render
+
+    call _startTestRender
+
+    jmp _whileLoop
+
 
     exit
 

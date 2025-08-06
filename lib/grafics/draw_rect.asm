@@ -8,18 +8,17 @@ _drawRect:
     push r8
     push r9
     push r10
-
     
     push rdx ; mul cloober rdx
     shl rax, 2 ; pixel conversion
     mul qword [fb_width]
     pop rdx
+
+    mov r8, rax ; save height offset
     
     test r12, 0b10
     je _drawRectCameraSkip
     ; convert to camera relative cordiantes
-    
-    mov r8, rax ; save height offset
 
     mov r10, rdx
     sub rdx, [camera_coordinates] ; width camera offset

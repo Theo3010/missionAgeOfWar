@@ -3,6 +3,7 @@
 %include "lib/mem/heap_free.asm"
 
 %include "lib/to_string.asm"
+%include "lib/world_cords.asm"
 
 _render:
     push r10
@@ -20,10 +21,10 @@ _render:
     call _drawBase
 
     ; draw trops
-    ; call _drawTroops
+    call _drawTroops
 
     ; draw menu
-    ; call _drawHUD
+    call _drawHUD
 
     framebuffer_flush
 
@@ -49,9 +50,9 @@ _drawBase:
     add rax, 190
     
     draw_rect 0x50, rax, 25, rcx, 0x00FF0000, 0b10 ; player health bar
-
+    
     to_string [PlayerHealth] ; uses the string buffer (a tempary place for strings), NOT the heap (no need for free.)
-    set_text rax, 0x45, 205, 2, 0x00FF0000
+    set_text rax, 0x75, 205, 2, 0x00FF0000, 0b1 ; 
     
     ; base 2
     draw_image [r10 + 8 * 1], 0x8a0, 0x1dd, 0b1
@@ -67,6 +68,9 @@ _drawBase:
 
     draw_rect 0x8ee, 188, 28, 253, 0x0, 0b10 ; player health background
     draw_rect 0x8f0, rax, 25, rcx, 0x00FF0000, 0b10 ; enemy health bar
+    
+    to_string [EnemyHealth] ; uses the string buffer (a tempary place for strings), NOT the heap (no need for free.)
+    set_text rax, 0x8be, 205, 2, 0x00FF0000, 0b1
 
     ret
 
@@ -86,12 +90,12 @@ _drawHUD:
     draw_image [r10 + 8 * 3], 0, 0, 0b10
 
     to_string [PlayerGold]
-    set_text rax, 30, 16, 3, 0x00FFFF00
+    set_text rax, 30, 16, 3, 0x00FFFF00, 0
 
-    set_text _renderConst.expMsg, 10, 50, 2, 0x0
+    set_text _renderConst.expMsg, 10, 50, 2, 0x0, 0
 
     to_string [PlayerExp]
-    set_text rax, 75, 45, 3, 0x00FF0000
+    set_text rax, 75, 45, 3, 0x00FF0000, 0
     
     ; mainMenu
 
@@ -140,23 +144,23 @@ _menuNotSkipThree:
 
 
     ; menu text
-    set_text _renderConst.MainMenuMsg, 900, 10, 3, 0x00FFFF00
+    set_text _renderConst.MainMenuMsg, 900, 10, 3, 0x00FFFF00, 0
 
-    set_text [HUDbuttonmsgPtr], 215, 65, 2, 0x00FFFF00
+    set_text [HUDbuttonmsgPtr], 215, 65, 2, 0x00FFFF00, 0
 
     ; units queue
-    draw_rect 210, 15, 460, 10, 0x0, 0b1
 
-    draw_rect 690, 10, 20, 20, 0xc4c4c4, 0b0 
-    draw_rect 690, 10, 20, 20, 0x0, 0b1
-    draw_rect 720, 10, 20, 20, 0x0, 0b1 
-    draw_rect 750, 10, 20, 20, 0x0, 0b1 
-    draw_rect 780, 10, 20, 20, 0x0, 0b1 
-    draw_rect 810, 10, 20, 20, 0x0, 0b1 
+    draw_rect 210, 15, 460, 10, 0x0, 0b1 ; bar
+   
+    draw_rect 690, 10, 20, 20, 0x0, 0b1 ; square
+    draw_rect 720, 10, 20, 20, 0x0, 0b1 ; square 
+    draw_rect 750, 10, 20, 20, 0x0, 0b1 ; square
+    draw_rect 780, 10, 20, 20, 0x0, 0b1 ; square
+    draw_rect 810, 10, 20, 20, 0x0, 0b1 ; square
 
 
     ; special abilty
-    set_text _renderConst.specialAbiltyMsg, 1055, 133, 2, 0x00FFFF00
+    set_text _renderConst.specialAbiltyMsg, 1055, 133, 2, 0x00FFFF00, 0
 
     draw_image [r10 + 8 * 10], 1185, 125, 0b10 ;
 
