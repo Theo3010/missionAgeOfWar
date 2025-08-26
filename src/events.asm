@@ -20,6 +20,9 @@ _keyLisener:
     cmp dword [key], 32 ; space -> menu select
     je _menuSelect
 
+    cmp dword [key], 115 ; s -> specialAbilty
+    je _specialAbilty
+
     cmp dword [key], 0x00435b1b  ; right
     je _turnRight
 
@@ -48,6 +51,18 @@ _turnLeft:
     sub dword [camera_coordinates], 0x20
 
 _skipTurn:
+    ret
+
+
+_specialAbilty:
+
+    cmp dword [specialAbiltyCooldown], 0
+    jg _skipSpecialAbilty
+
+    mov dword [specialAbiltyCooldown], 91
+
+_skipSpecialAbilty:
+
     ret
 
 _keyDebugMode:

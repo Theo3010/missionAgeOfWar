@@ -2,11 +2,16 @@
 %define NEXTZERO
 
 
-; void* {rax} nextZero(void* [rdi])
+; void* {rax} nextZero(void* {rdi})
 ; moves pointer to the next zero in the heap
 ; if current pointer is zero, it returns -1
 _nextZero:
     push rbx
+
+    ; ; read the header of the heap
+    ; mov rcx, qword [rdi] ; header
+    ; and rcx, 0xfffffffffffffff0 ; remove flags
+
 
 _nextZeroLoop:
     mov al, byte [rdi] ; read header

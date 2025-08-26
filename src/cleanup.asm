@@ -4,7 +4,10 @@
 %include "lib/exit.asm"
 
 _cleanAndExit:
+    mov byte [isRunning], 0
+
     print_flush
     framebuffer_flush
     reset_termois
+
     exit

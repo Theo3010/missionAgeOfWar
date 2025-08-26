@@ -17,7 +17,7 @@ _sort:
     mov rax, rdi
     sub rax, 8
     mov rbx, qword [rax] ; header
-    and rbx, 0xfffffffffffffff0 ; remove flags
+    and rbx, 0xfffffffffffffff8 ; remove flags
 
     ; allocate new memory
     heap_allocate rbx

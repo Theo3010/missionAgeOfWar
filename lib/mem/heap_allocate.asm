@@ -127,7 +127,7 @@ _errorHeap:
 
 
 .errorHeapMsg:
-    db "ERROR: Heap error. Remember to call 'heap_init' before any use of heap", 0
+    db "ERROR: Heap error. Remember to call 'heap_init' before any use of heap. The heap may be out of memory", 0
 
 _doneHeap:
     pop r9

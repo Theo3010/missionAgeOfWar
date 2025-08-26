@@ -1,5 +1,6 @@
 %include "lib/grafics/draw_rect.asm"
 %include "lib/grafics/set_text.asm"
+%include "lib/grafics/filter.asm"
 %include "lib/mem/heap_free.asm"
 
 %include "lib/to_string.asm"
@@ -76,7 +77,24 @@ _drawBase:
 
 _drawTroops:
 
-    draw_image [r10 + 8 * 7], 0x170, 0x250, 0
+    mov rax, [unitsSpawned] ; get pointer to the units spawned
+    test rax, rax ; check if unitsSpawned is NULL
+    jz _drawTroopsReturn ; if NULL, return
+
+    mov rcx, [rax+8]
+
+    mov rax, [rax] ; get unit data pointer
+    mov bl, byte [rax] ; get unit type
+    shl bl, 3 ; multiply by 8 (size of each image pointer)
+
+    mov rax, r10
+    add al, bl
+
+    draw_image [rax], rcx, 0x250, 0
+    sub rcx, 0x40
+    draw_image [rax], rcx, 0x250, 0
+
+_drawTroopsReturn:
 
     ret
 
@@ -158,11 +176,35 @@ _menuNotSkipThree:
     draw_rect 780, 10, 20, 20, 0x0, 0b1 ; square
     draw_rect 810, 10, 20, 20, 0x0, 0b1 ; square
 
+    ; draw filled squares per unit in queue
+    mov rax, [unitQueueLength]
+
+    mov rbx, 0 ; counters
+_renderQueueLoop:
+
+    cmp rbx, rax ; check if all units are drawn
+    jge _renderQueueLoopEnd
+
+    mov rdx, rbx
+    imul rdx, 30 ; 30 pixels per unit
+    add rdx, 691 ; x position of first square
+    draw_rect rdx, 11, 17, 18, 0xc4c4c4, 0b0 ; square
+
+
+    inc rbx
+    jmp _renderQueueLoop
+
+_renderQueueLoopEnd:
+
 
     ; special abilty
     set_text _renderConst.specialAbiltyMsg, 1055, 133, 2, 0x00FFFF00, 0
 
     draw_image [r10 + 8 * 10], 1185, 125, 0b10 ;
+
+    mov rdx, [specialAbiltyCooldown]
+    brightness 50, 0x275a1, rdx, 41, 1
+
 
     ret
 

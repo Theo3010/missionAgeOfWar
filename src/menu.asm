@@ -51,14 +51,19 @@ _menuMainSelector:
 
 _menuUnitSelector:
 
+    mov rcx, 0 ; unit type
+
+    mov rax, 0
     cmp byte [menuHover], 0
-    ; unit 1
+    cmove rcx, rax
 
+    mov rax, 1
     cmp byte [menuHover], 1
-    ; unit 2
+    cmove rcx, rax
 
+    mov rax, 2
     cmp byte [menuHover], 2
-    ; unit 3
+    cmove rcx, rax
 
     mov al, [menuSelected]
     mov rbx, 0
@@ -69,6 +74,8 @@ _menuUnitSelector:
     mov byte [menuSelected], al
 
     call _menuHudText
+
+    unit_create rcx
 
     ret
 

@@ -15,6 +15,7 @@
 %include "lib/io/string_concat.asm"
 %include "lib/io/print_registers.asm"
 
+%include "lib/debug/save_registers.asm"
 
 %include "lib/mem/heap_init.asm"
 %include "lib/mem/heap_allocate.asm"
@@ -55,25 +56,33 @@
 %include "lib/grafics/draw_image.asm"
 %include "lib/grafics/draw_rect.asm"
 %include "lib/grafics/multi_load_images.asm"
+%include "lib/grafics/filter.asm"
 
-%include "lib/debug/save_registers.asm"
+%include "lib/audio/load_audio.asm"
+%include "lib/audio/play_audio.asm"
+%include "lib/riff_reader.asm"
+%include "lib/threading.asm"
 
-%include "src/events.asm"
+; %include "src/events.asm"
+; %include "src/init.asm"
 
 
 section .data
     imagesPath db "../images/", 0
-    background db "../images/00_    background.bmp", 0
+    audioMusicFile db "../audio/00_GloriousMorning.wav", 0
     errorBmp db "Image file is not a bmp", 10, 0
     PRINT_BUFFER_LENGTH dq 0
     fbfileName db `/dev/fb0\0`
+    clear_screen db `\e[2J`, 0
 
 section .bss
     registers resb 120
     debugMode resb 4
+    isRunning resb 2
 
     key resb 4
     imageHeader resb 14
+    audioHeader resb 12
     
     clock_time resb 16
     time resb 16
@@ -104,31 +113,17 @@ section .bss
     menuSelected resb 8
     HUDbuttonmsgPtr resb 8
 
-
     FolderInfoBuffer resb 4096
 
 section .text
     global _start
 
 
-_startprintloop:
-    print rax
+_busyThread:
+    sleep 1_000_000
+    print_decimal 100
     print_ascii_value 10
-    next_zero rax
-    cmp rax, -1
-    jne _startprintloop
-
-    ret
-
-_startTestRender:
-    framebuffer_fill 0x000000 ; clear framebuffer
-    
-    mov r10, [imagesPointer] ; get pointer to images
-
-    word_cords 0x4e, 28 ; get world cords for offset 0 and width 100
-    draw_rect rax, 188, rbx, 253, 0x0, 0 ; player health background
-
-    framebuffer_flush
+    print_flush
 
     ret
 
@@ -136,25 +131,13 @@ _start:
 
     heap_init
 
-    framebuffer_init
+    create_thread _busyThread, 0
+    mov r8, rax ; save PID
 
-    multi_load_images imagesPath
-    mov qword [imagesPointer], rax
+    sleep 10_000_000
 
-
-_whileLoop:
-    ;   events (key inputs)
-    call _keyLisener
-
-    clock_tick 60 ; fps
-    cmp rax, 0
-    je _whileLoop ; no render
-
-    call _startTestRender
-
-    jmp _whileLoop
-
+    print_decimal 42
+    print_ascii_value 10
+    print_flush
 
     exit
-
-

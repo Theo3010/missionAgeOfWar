@@ -17,6 +17,7 @@ _multiLoadImages:
     ; get files in folderPath
     get_files rdi
 
+
     ; sort files
     sort rax
     mov rdi, rax ; save pointer to sorted files

@@ -6,38 +6,34 @@
 ; void sleep(int {rax})
 ;   waits AT LEAST {rax} microsecounds
 _sleep:
-    ; clobbed
     push rbx
     push rdx
 
-    ; save input
-    push rax
+    push rcx
+    push r11
+    
+    ; Convert microseconds to timespec
+    mov rbx, 1000000
+    xor rdx, rdx
+    div rbx                         ; rax = seconds, rdx = μs remainder
+    
+    mov [time], rax       ; store seconds
+    mov rax, rdx                    ; get remainder
+    mov rbx, 1000
+    mul rbx                         ; convert to nanoseconds
+    mov [time + 8], rax   ; store nanoseconds
+    
+    ; Call nanosleep
+    mov rax, 35                     ; SYS_nanosleep  
+    mov rdi, time
+    mov rsi, 0
+    syscall
 
-    get_time time
-
-    mov rax, [time]
-    mov rdx, 1000000
-    mul rdx
-    add rax, [time+8]
-
-    pop rbx
-    add rbx, rax ; wait until rbx total microseconds reached
-
-_loopSleep:
-
-    get_time time
-
-    mov rax, [time]
-    mov rdx, 1000000
-    mul rdx
-    add rax, [time+8]
-
-    cmp rbx, rax
-    jge _loopSleep
-
+    pop r11
+    pop rcx
+    
     pop rdx
     pop rbx
-
     ret
 
 

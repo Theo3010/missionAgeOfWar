@@ -14,7 +14,7 @@ _queueInit:
     ; head = dword {rax}
     ; tail = dword {rax+4}
     ; size_t = dword {rax+8}
-    ; amount = dword {rax+12}
+    ; total_amount = dword {rax+12}
     ; arrayPtr = qword {rax+16}
     
     ; tail
@@ -24,6 +24,7 @@ _queueInit:
     mov dword [rax+8], ecx
 
     ; amount
+    inc ebx ; queue takes one extra space for head
     mov dword [rax+12], ebx
     
     push rax ; save pointer
@@ -196,5 +197,6 @@ _queuePopNoElementError:
     mov rax, %1
     call _queuePop
 %endmacro
+
 
 %endif

@@ -6,12 +6,16 @@
 ;   takes file descriptor in {rax} and char pointer in {rbx} and the amount of data to write in {rcx}
 ;   returns the amount of written data. 
 _fileWrite:
-    push rax
+
+    push rcx
+    push r11
 
     mov rax, 1 ; sys_write
     syscall
+
+    pop r11
+    pop rcx
     
-    pop rax
     ret
 
 
