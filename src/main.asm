@@ -81,8 +81,8 @@ section .bss
 
     screen_Buffer_address resb 8
 
-    imageHeader resb 14
-    audioHeader resb 12
+    imageHeader resb 16
+    audioHeader resb 16
     
     camera_coordinates resb 8
 
@@ -97,16 +97,16 @@ section .bss
     specialAbiltyCooldown resb 8
     nextAgeExpRequirement resb 8
     
-    unitQueue resb 8
-    unitQueueLength resb 8
+    unitQueue resb 16
+    unitSpawingTimer resb 16
 
-    unitsSpawned resb 8
+    unitsSpawnedPtr resb 16
     
     menuHover resb 8
     menuSelected resb 8
     HUDbuttonmsgPtr resb 8
     
-    EnemyHealth resb 8
+    EnemyBase resb 8
 
     PRINT_BUFFER resb PRINT_BUFFER_SIZE
     HEAP resb HEAP_SIZE
@@ -115,7 +115,10 @@ section .bss
 section .text
     global _start
 
+
+; sudo modprobe snd-pcn-oss to enable /dev/dsp
 _backgroundmusic:
+
     load_audio audioMusicFile
 
 _backgroundmusicLoop:
@@ -153,7 +156,7 @@ _whileLoop:
 
     add qword [PlayerGold], 1
     add qword [PlayerExp], 1
-    
+
     call _render
 
     cmp dword [specialAbiltyCooldown], 0

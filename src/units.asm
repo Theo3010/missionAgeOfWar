@@ -1,18 +1,24 @@
 %include "lib/queue.asm"
 %include "lib/to_string.asm"
 %include "lib/grafics/set_text.asm"
+%include "lib/check_colision.asm"
+
+%include "lib/foreach.asm"
 
 ; void _unitCreate(int unitType {rbx})
 ; creates a unit of type unitType
 _unitCreate:
 
+    cmp rbx, -1
+    je _unitCreateReturn
+
     ; check if unit queue is full
-    mov rax, [unitQueueLength] ; get current length of the queue
+    queue_length [unitQueue]
     cmp rax, 5 ; if length >= 5, return
     jae _unitCreateReturn ; if full, return
 
     ; find unit data
-    imul rbx, 14
+    imul rbx, 15
     lea rcx, [_units + rbx] ; rcx = unit
 
     ; check if money is enough
@@ -37,9 +43,6 @@ _unitCreate:
     ; add unit to the units queue
     mov rbx, rax ; swich register due to marco order.
     queue_add [unitQueue], rbx ;
-    inc dword [unitQueueLength] ; increment queue length
-
-    mov [unitsSpawned], rax ; save pointer to the created unit
 
 _unitCreateReturn:
 
@@ -52,23 +55,80 @@ _unitCreateReturn:
 %endmacro
 
 
+_unitsUpdateLoop:
+    push rbx
+    push rcx
+
+    check_colision rax, [EnemyBase]
+    jnz _unitUpdateAttack
+
+    add word [rax+8], 4 ; normal value 4
+    add word [rax+10], 4
+    add word [rax+12], 4
+
+    jmp _unitsUpdateLoopEnd
+
+_unitUpdateAttack:
+    mov rax, [rax] ; unit data
+    mov rbx, [EnemyBase] ; enemy base pointer
+    mov ecx, dword [rbx+14] ; enemy base health
+
+    cmp ecx, 5
+    jle _unitsUpdateLoopEnd
+
+    sub ecx, dword [rax+9] ; enemy base - unit dmg
+    mov dword [rbx+14], ecx ; update enemy base health
+
+_unitsUpdateLoopEnd:
+
+    pop rcx
+    pop rbx
+
+    ret
+
+
+
 ; void unitsUpdate(void)
 ;   updates each unit
 _unitsUpdate:
-    sleep 500_000 ; walk 1 every 5th secound
+    sleep 50_000 ; 0.05 s
 
     cmp byte [isRunning], 0
     je _unitsUpdateReturn
 
-    mov rax, [unitsSpawned] ; get unit spawned
-
-    test rax, rax
-    jz _unitsUpdate
+    queue_peek [unitQueue]
+    cmp rax, -1
+    je _unitsSpawnSkip
     
-    cmp word [rax+8], 0x840
-    jge _unitsUpdate
+    mov rax, [rax] ; get the unit data
 
-    add word [rax+8], 0x10
+    xor rbx, rbx
+    xor rcx, rcx
+    mov cl, byte [rax+14]
+    inc cl
+    mov bl, byte [unitSpawingTimer]
+    cmp byte [unitSpawingTimer], 0 ; if r10 is 0, then set it to the unit spawn timer
+    cmovle rbx, rcx
+    mov byte [unitSpawingTimer], bl
+
+    dec byte [unitSpawingTimer] ; each loop dec timer once
+
+    cmp byte [unitSpawingTimer], 0 ; when timer hit 0 then spawn unit  
+    jg _unitsSpawnSkip
+
+    queue_pop [unitQueue]
+    mov rbx, rax
+    queue_add [unitsSpawnedPtr], rbx
+
+_unitsSpawnSkip:
+
+    ; units movement
+    queue_peek [unitsSpawnedPtr] ; get unit spawned
+
+    cmp rax, -1
+    je _unitsUpdate
+    
+    foreach [unitsSpawnedPtr], _unitsUpdateLoop
     
     jmp _unitsUpdate
 
@@ -82,16 +142,33 @@ _units:
 
 .clubman:
     db 7 ; unit type / image id (1 bytes - byte)
-    db 15, 0, 0, 0 ; unit cost (4 bytes - dword)
-    db 50, 0, 0, 0 ; unit health (4 bytes - dword)
-    db 15, 0, 0, 0 ; unit damage (4 bytes - dword)
+    dd 15 ; unit cost (4 bytes - dword)
+    dd 50 ; unit health (4 bytes - dword)
+    dd 15 ; unit damage (4 bytes - dword)
     db 1 ; unit speed (1 byte - byte)
-    db 1 ; unit spawn speed (1 byte)
+    db 20 ; unit spawn speed (1 byte)
 
 
 .slingshot: ; numbers need to be validated
-    db 11 ; unit type / image id
-    db 20, 0, 0, 0 ; unit cost
-    db 30, 0, 0, 0 ; unit health
-    db 20, 0, 0, 0 ; unit damage
-    db 2 ; unit speed
+    db 11 ; unit type / image id (1 bytes - byte)
+    dd 25 ; unit cost (4 bytes - dword)
+    dd 50 ; unit health (4 bytes - dword)
+    dd 15 ; unit damage (4 bytes - dword)
+    db 1 ; unit speed (1 byte - byte)
+    db 20 ; unit spawn speed (1 byte)
+
+.dinorider: ; numbers need to be validated
+    db 11 ; unit type / image id (1 bytes - byte)
+    dd 100 ; unit cost (4 bytes - dword)
+    dd 50 ; unit health (4 bytes - dword)
+    dd 15 ; unit damage (4 bytes - dword)
+    db 1 ; unit speed (1 byte - byte)
+    db 50 ; unit spawn speed (1 byte)
+
+
+_bases:
+
+.baseAge1:
+    db 1 ; image id
+    dd 510 ; base health
+

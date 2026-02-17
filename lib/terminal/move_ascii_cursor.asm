@@ -1,6 +1,9 @@
 %ifndef MOVE_ASCII_CURSOR
 %define MOVE_ASCII_CURSOR
 
+%include "lib/io/print_decimal.asm"
+%include "lib/io/print_ascii_value.asm"
+
 _moveAsciiCursor:
 
     print_ascii_value 27 ; backslash (note: dangerous even in comments)

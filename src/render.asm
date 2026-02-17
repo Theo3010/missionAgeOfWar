@@ -6,12 +6,14 @@
 %include "lib/to_string.asm"
 %include "lib/world_cords.asm"
 
+%include "lib/foreach.asm"
+
 _render:
     push r10
 
     ; void framebufferFill(int {rcx})
     framebuffer_fill 0x0 ; black
-    
+
     ; load images pointer
     mov r10, [imagesPointer] ; get pointer to images
 
@@ -57,31 +59,36 @@ _drawBase:
     
     ; base 2
     draw_image [r10 + 8 * 1], 0x8a0, 0x1dd, 0b1
+    draw_rect 0x8ee, 188, 28, 253, 0x0, 0b10 ; player health background
 
-    mov rcx, [EnemyHealth]
+    mov rax, [EnemyBase]
+    xor rdi, rdi
+    mov edi, dword [rax+14] ; base health
+
+    mov rcx, rdi
     shr rcx, 1 
-    mov rdx, 1
-    cmp rcx, 0
-    cmovle rcx, rdx 
+    cmp rcx, 5
+    jle _renderEnemyBaseNoDraw
     mov rax, 250
     sub rax, rcx ; 250 - current health
     add rax, 190
 
-    draw_rect 0x8ee, 188, 28, 253, 0x0, 0b10 ; player health background
     draw_rect 0x8f0, rax, 25, rcx, 0x00FF0000, 0b10 ; enemy health bar
     
-    to_string [EnemyHealth] ; uses the string buffer (a tempary place for strings), NOT the heap (no need for free.)
+_renderEnemyBaseNoDraw:
+    sub rdi, 10
+    to_string rdi ; uses the string buffer (a tempary place for strings), NOT the heap (no need for free.)
     set_text rax, 0x8be, 205, 2, 0x00FF0000, 0b1
 
     ret
 
-_drawTroops:
+_drawTroopsLoop:
+    push rax
+    push rbx
+    push rcx
+    push r10
 
-    mov rax, [unitsSpawned] ; get pointer to the units spawned
-    test rax, rax ; check if unitsSpawned is NULL
-    jz _drawTroopsReturn ; if NULL, return
-
-    mov rcx, [rax+8]
+    movzx rcx, word [rax+8]
 
     mov rax, [rax] ; get unit data pointer
     mov bl, byte [rax] ; get unit type
@@ -91,8 +98,23 @@ _drawTroops:
     add al, bl
 
     draw_image [rax], rcx, 0x250, 0
-    sub rcx, 0x40
-    draw_image [rax], rcx, 0x250, 0
+
+    pop r10
+    pop rcx
+    pop rbx
+    pop rax
+
+    ret
+
+_drawTroops:
+
+    queue_peek [unitsSpawnedPtr]
+
+    cmp rax, -1
+    je _drawTroopsReturn ; if NULL, return
+
+
+    foreach [unitsSpawnedPtr], _drawTroopsLoop
 
 _drawTroopsReturn:
 
@@ -177,7 +199,7 @@ _menuNotSkipThree:
     draw_rect 810, 10, 20, 20, 0x0, 0b1 ; square
 
     ; draw filled squares per unit in queue
-    mov rax, [unitQueueLength]
+    queue_length [unitQueue]
 
     mov rbx, 0 ; counters
 _renderQueueLoop:
@@ -196,6 +218,25 @@ _renderQueueLoop:
 
 _renderQueueLoopEnd:
 
+    queue_peek [unitQueue]
+    cmp rax, -1
+    je _renderQueueSpawnBarSkip
+
+    mov rax, [rax]
+    xor rcx, rcx
+    mov cl, byte [rax+14]
+    mov rax, 460
+    xor rdx, rdx
+    div rcx ; 460 / spawn time
+
+    mov rbx, [unitSpawingTimer]
+    inc rbx
+    imul rbx, rax
+    sub rbx, rax
+    inc rbx
+    draw_rect 210, 15, rbx, 10, 0x00FF0000, 0b0
+
+_renderQueueSpawnBarSkip:
 
     ; special abilty
     set_text _renderConst.specialAbiltyMsg, 1055, 133, 2, 0x00FFFF00, 0

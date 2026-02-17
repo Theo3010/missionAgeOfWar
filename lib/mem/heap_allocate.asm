@@ -48,18 +48,21 @@ _findSpaceLoop:
     cmp rcx, 0 ; if allocated go next
     jne _goNextHeader
 
-    ; if header.size > N+16:
+    ; if header.size >= N+16:
     mov rcx, [rbx]
     mov rdx, rax
     add rdx, 16
     cmp rcx, rdx
-    jg _allocate
+    jge _allocate
 
-    ; if header.size > N
+
+    ; if header.size >= N
     mov rcx, [rbx]
     mov r9, 1
     cmp rcx, rax
     jge _allocate
+    
+    mov r9, 0 ; reset flag
 
 _goNextHeader:
     mov rcx, [rbx] ; get header value

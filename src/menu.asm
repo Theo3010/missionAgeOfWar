@@ -51,7 +51,7 @@ _menuMainSelector:
 
 _menuUnitSelector:
 
-    mov rcx, 0 ; unit type
+    mov rcx, -1 ; unit type
 
     mov rax, 0
     cmp byte [menuHover], 0
