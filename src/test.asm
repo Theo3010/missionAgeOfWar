@@ -39,7 +39,18 @@ _start:
     queue_add r10, 0x22
     queue_add r10, 0x33
     queue_add r10, 0x44
+    queue_pop r10
+
     queue_add r10, 0x55
+    queue_add r10, 0x66
+    
+    queue_pop r10
+    queue_pop r10
+    
+    queue_add r10, 0x77
+    queue_add r10, 0x88
+
+    foreach r10, _printEachElement
 
     print_ascii_value 10
     print_flush

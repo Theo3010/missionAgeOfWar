@@ -14,18 +14,20 @@ _foreach:
     push rdx
     push r8
 
+    mov r8, rbx
+
     mov rcx, rax
     queue_length rcx
     mov rdx, rax ; length of queue
+    mov rbx, 1 ; counter
 
 _foreachLoop:
-    queue_pop rcx ; get element
-    mov r8, rax
-    queue_add rcx, r8 ; add back the element
-    call rbx ; call func
+    queue_peek rcx, rbx ; get element
+    call r8 ; call func(void* {rax}, int {rbx}, Queue {rcx}) | where {rax} is the element in queue and {rbx} is the index
 
-    dec rdx
-    jnz _foreachLoop
+    inc rbx
+    cmp rbx, rdx
+    jle _foreachLoop
 
     pop r8
     pop rdx

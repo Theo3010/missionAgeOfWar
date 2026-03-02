@@ -38,7 +38,7 @@ _menuMainSelector:
     ; elif 3
     cmp byte [menuHover], 3
     ; buy tower slot
-    ; je _menuBuyTowerSlot
+    je _menuBuyTowerSlot
 
     ; elif 4
     cmp byte [menuHover], 4
@@ -113,6 +113,22 @@ _menuNextAge:
     mov qword [PlayerAge], rbx
 
     ; TODO: update next age exp requrement
+
+    ret
+
+
+_menuBuyTowerSlot:
+    mov rdx, 0
+    mov rbx, 1
+
+    mov eax, dword [_turrets.TurretSlotCost]
+    
+    cmp rax, qword [PlayerGold]
+    cmovg rax, rdx
+    cmovg rbx, rdx
+
+    add qword [PlayerTurretSlotAmount], rbx
+    sub qword [PlayerGold], rax
 
     ret
 

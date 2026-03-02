@@ -18,7 +18,7 @@ _unitCreate:
     jae _unitCreateReturn ; if full, return
 
     ; find unit data
-    imul rbx, 15
+    imul rbx, 18
     lea rcx, [_units + rbx] ; rcx = unit
 
     ; check if money is enough
@@ -37,8 +37,13 @@ _unitCreate:
 
     mov qword [rax], rcx ; store ptr to unit data
     mov word [rax + 8], 0x170 ; unit x position
-    mov word [rax + 10], 0x160 ; unit colision point
-    mov word [rax + 12], 0x180 ; unit colision point
+
+    mov word [rax + 10], 0x150 ; unit colision point
+
+    mov rbx, 0x170
+    add bx, word [rcx+16]
+
+    mov word [rax + 12], bx ; unit colision point
 
     ; add unit to the units queue
     mov rbx, rax ; swich register due to marco order.
@@ -58,29 +63,55 @@ _unitCreateReturn:
 _unitsUpdateLoop:
     push rbx
     push rcx
+    push rdx
 
-    check_colision rax, [EnemyBase]
+    mov rdx, rax ; save unit
+
+    dec rbx
+    queue_peek rcx, rbx
+    
+    cmp rax, -1 ; no unit ahead
+    jne _unitCheckNext
+
+    check_colision rdx, [EnemyBase] ; check for the enemyBase
     jnz _unitUpdateAttack
 
-    add word [rax+8], 4 ; normal value 4
-    add word [rax+10], 4
-    add word [rax+12], 4
+    jmp _unitWalk
+
+_unitCheckNext:
+
+    ; unit ahead
+    check_colision rdx, rax ; rdx (current unit), rax (unit ahead)
+    jnz _unitUpdateAttack
+
+_unitWalk:
+
+    mov rax, [rdx]
+
+    xor rbx, rbx
+
+    mov bl, byte [rax+13]
+
+    add word [rdx+8], bx  ; normal value 4
+    add word [rdx+10], bx
+    add word [rdx+12], bx
 
     jmp _unitsUpdateLoopEnd
 
 _unitUpdateAttack:
-    mov rax, [rax] ; unit data
+    mov rdx, [rdx] ; unit data
     mov rbx, [EnemyBase] ; enemy base pointer
     mov ecx, dword [rbx+14] ; enemy base health
 
     cmp ecx, 5
     jle _unitsUpdateLoopEnd
 
-    sub ecx, dword [rax+9] ; enemy base - unit dmg
+    sub ecx, dword [rdx+9] ; enemy base - unit dmg
     mov dword [rbx+14], ecx ; update enemy base health
 
 _unitsUpdateLoopEnd:
 
+    pop rdx
     pop rcx
     pop rbx
 
@@ -96,7 +127,7 @@ _unitsUpdate:
     cmp byte [isRunning], 0
     je _unitsUpdateReturn
 
-    queue_peek [unitQueue]
+    queue_peek [unitQueue], 1
     cmp rax, -1
     je _unitsSpawnSkip
     
@@ -105,7 +136,6 @@ _unitsUpdate:
     xor rbx, rbx
     xor rcx, rcx
     mov cl, byte [rax+14]
-    inc cl
     mov bl, byte [unitSpawingTimer]
     cmp byte [unitSpawingTimer], 0 ; if r10 is 0, then set it to the unit spawn timer
     cmovle rbx, rcx
@@ -123,7 +153,7 @@ _unitsUpdate:
 _unitsSpawnSkip:
 
     ; units movement
-    queue_peek [unitsSpawnedPtr] ; get unit spawned
+    queue_peek [unitsSpawnedPtr], 1 ; get unit spawned
 
     cmp rax, -1
     je _unitsUpdate
@@ -139,31 +169,37 @@ _unitsUpdateReturn:
 
 _units:
 
-
 .clubman:
-    db 7 ; unit type / image id (1 bytes - byte)
-    dd 15 ; unit cost (4 bytes - dword)
-    dd 50 ; unit health (4 bytes - dword)
-    dd 15 ; unit damage (4 bytes - dword)
-    db 1 ; unit speed (1 byte - byte)
-    db 20 ; unit spawn speed (1 byte)
+    db 7       ; unit type / image id (1 bytes - byte)
+    dd 15      ; unit cost (4 bytes - dword)
+    dd 50      ; unit health (4 bytes - dword)
+    dd 15      ; unit damage (4 bytes - dword)
+    db 20      ; unit speed (1 byte - byte)
+    db 20      ; unit spawn speed (1 byte)
+    db 0       ; height offset (1 byte )
+    dw 0x20    ; collision offset (2 byte)
 
 
-.slingshot: ; numbers need to be validated
-    db 11 ; unit type / image id (1 bytes - byte)
-    dd 25 ; unit cost (4 bytes - dword)
-    dd 50 ; unit health (4 bytes - dword)
-    dd 15 ; unit damage (4 bytes - dword)
-    db 1 ; unit speed (1 byte - byte)
-    db 20 ; unit spawn speed (1 byte)
+.slingshot:    ; numbers need to be validated
+    db 11      ; unit type / image id (1 bytes - byte)
+    dd 25      ; unit cost (4 bytes - dword)
+    dd 50      ; unit health (4 bytes - dword)
+    dd 15      ; unit damage (4 bytes - dword)
+    db 20      ; unit speed (1 byte - byte)
+    db 20      ; unit spawn speed (1 byte)
+    db 0       ; height offset (1 byte )
+    dw 0x20    ; collision offset (2 byte)
 
-.dinorider: ; numbers need to be validated
-    db 11 ; unit type / image id (1 bytes - byte)
-    dd 100 ; unit cost (4 bytes - dword)
-    dd 50 ; unit health (4 bytes - dword)
-    dd 15 ; unit damage (4 bytes - dword)
-    db 1 ; unit speed (1 byte - byte)
-    db 50 ; unit spawn speed (1 byte)
+
+.dinorider:   ; numbers need to be validated
+    db 12     ; unit type / image id (1 bytes - byte)
+    dd 100    ; unit cost (4 bytes - dword)
+    dd 50     ; unit health (4 bytes - dword)
+    dd 15     ; unit damage (4 bytes - dword)
+    db 20     ; unit speed (1 byte - byte)
+    db 50     ; unit spawn speed (1 byte)
+    db 42     ; height offset (1 byte )
+    dw 0xa0   ; collision offset (2 byte)
 
 
 _bases:
@@ -171,4 +207,13 @@ _bases:
 .baseAge1:
     db 1 ; image id
     dd 510 ; base health
+
+
+_turrets:
+
+.TurretSlotCost:
+    dd 1000
+    dd 2000
+    dd 3000
+    dd 4000
 

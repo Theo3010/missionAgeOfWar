@@ -1,6 +1,6 @@
 ; defines
 %define PRINT_BUFFER_SIZE 1024
-%define HEAP_SIZE 0x10000000 ; ~256 MB
+%define HEAP_SIZE 0xcb2000 ; ~256 KB
 %define FALSE 0
 %define TRUE 1
 
@@ -54,6 +54,7 @@
 section .data
     imagesPath db "../images/", 0
     audioMusicFile db "../audio/00_GloriousMorning.wav", 0
+
     PRINT_BUFFER_LENGTH dq 0
 
     clear_screen db `\e[2J`, 0
@@ -94,6 +95,7 @@ section .bss
     PlayerGold resb 8
     PlayerAge resb 8
     PlayerHealth resb 8
+    PlayerTurretSlotAmount resb 8
     specialAbiltyCooldown resb 8
     nextAgeExpRequirement resb 8
     
@@ -134,7 +136,7 @@ _start:
 
     call _init
 
-    create_thread _backgroundmusic, 0
+    ; create_thread _backgroundmusic, 0
 
     create_thread _unitsUpdate, 0
 
@@ -154,7 +156,7 @@ _whileLoop:
     cmp rax, 0
     je _whileLoop ; no render
 
-    add qword [PlayerGold], 1
+    add qword [PlayerGold], 10
     add qword [PlayerExp], 1
 
     call _render

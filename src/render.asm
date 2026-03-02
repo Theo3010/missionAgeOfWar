@@ -86,20 +86,29 @@ _drawTroopsLoop:
     push rax
     push rbx
     push rcx
+    push rdx
     push r10
 
     movzx rcx, word [rax+8]
 
+    xor rdx, rdx ; zero out register
+    xor rbx, rbx ; zero out register
+
     mov rax, [rax] ; get unit data pointer
     mov bl, byte [rax] ; get unit type
+    mov dl, byte [rax+15] ; get height offset
     shl bl, 3 ; multiply by 8 (size of each image pointer)
 
     mov rax, r10
     add al, bl
+    neg rdx
+    add rdx, 0x270
 
-    draw_image [rax], rcx, 0x250, 0
+
+    draw_image [rax], rcx, rdx, 0
 
     pop r10
+    pop rdx
     pop rcx
     pop rbx
     pop rax
@@ -108,7 +117,7 @@ _drawTroopsLoop:
 
 _drawTroops:
 
-    queue_peek [unitsSpawnedPtr]
+    queue_peek [unitsSpawnedPtr], 1
 
     cmp rax, -1
     je _drawTroopsReturn ; if NULL, return
@@ -186,7 +195,11 @@ _menuNotSkipThree:
     ; menu text
     set_text _renderConst.MainMenuMsg, 900, 10, 3, 0x00FFFF00, 0
 
-    set_text [HUDbuttonmsgPtr], 215, 65, 2, 0x00FFFF00, 0
+    mov eax, dword [_turrets.TurretSlotCost]
+    to_string rax
+    string_concat rax, [HUDbuttonmsgPtr]
+
+    set_text rax, 215, 65, 2, 0x00FFFF00, 0
 
     ; units queue
 
@@ -210,7 +223,7 @@ _renderQueueLoop:
     mov rdx, rbx
     imul rdx, 30 ; 30 pixels per unit
     add rdx, 691 ; x position of first square
-    draw_rect rdx, 11, 17, 18, 0xc4c4c4, 0b0 ; square
+    draw_rect rdx, 11, 19, 18, 0xc4c4c4, 0b0 ; square
 
 
     inc rbx
@@ -218,8 +231,10 @@ _renderQueueLoop:
 
 _renderQueueLoopEnd:
 
-    queue_peek [unitQueue]
+    queue_peek [unitQueue], 1
     cmp rax, -1
+    je _renderQueueSpawnBarSkip
+    cmp byte [unitSpawingTimer], 0
     je _renderQueueSpawnBarSkip
 
     mov rax, [rax]
@@ -230,9 +245,10 @@ _renderQueueLoopEnd:
     div rcx ; 460 / spawn time
 
     mov rbx, [unitSpawingTimer]
-    inc rbx
+    inc rcx
+    sub rcx, rbx ; total - current time
+    mov rbx, rcx
     imul rbx, rax
-    sub rbx, rax
     inc rbx
     draw_rect 210, 15, rbx, 10, 0x00FF0000, 0b0
 

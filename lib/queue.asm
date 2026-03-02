@@ -237,20 +237,38 @@ _queueLength:
 %endmacro
 
 
-; void* {rax} queue_peek(Queue {rax})
-; take a queue as input and returns the next element in to queue without change the state of th queue
+; void* {rax} queue_peek(Queue {rax}, int {rbx})
+; take a queue as input and returns the next element in to queue without change the state of the queue
+;   param Queue {rax}: is a pointer to the queue
+;   param int {rbx}: is the n'th element in the queue
+;   return: returns the element at the n'th element, while keep the state of the queue
 _queuePeek:
 
-    push rbx
+    push rcx
+
+    mov rcx, rbx
+    
+    cmp rbx, 0
+    je _noElementInQueuePeek
+
+    ; get length of queue
+    push rax
+    queue_length rax
+    mov rbx, rax
+    pop rax
+
+    cmp rcx, rbx ; compare length of queue with index
+    jg _noElementInQueuePeek
 
     mov rbx, [rax+8] ; get tail
-    ; move tail
-    inc rbx
+    ; move tail rbx amount
+    add rbx, rcx
     cmp rbx, [rax+24]
     jle _queueNoWrapPeek
 
     ; if out of array then wrap
-    mov rbx, 0 ; reset tail postion
+    sub rbx, [rax+24] ; subtract capacity (since currently out of bounds rbx > [rax+24])
+    dec rbx
 
 _queueNoWrapPeek:
     ; if tail == head then error
@@ -261,21 +279,26 @@ _queueNoWrapPeek:
     mov rax, [rax+16] ; get array
     mov rax, [rax+rbx*8] ; get element from array
 
-    pop rbx
+    pop rcx
 
     ; return rax
     ret
 
 _noElementInQueuePeek:
     mov rax, -1 ; no element code
-    pop rbx
+    pop rcx
 
     ret
 
-%macro queue_peek 1
+%macro queue_peek 2
+
+    push rbx
 
     mov rax, %1
+    mov rbx, %2
     call _queuePeek
+
+    pop rbx
 
 %endmacro
 
