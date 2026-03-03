@@ -213,7 +213,32 @@ _turrets:
 
 .TurretSlotCost:
     dd 1000
-    dd 2000
     dd 3000
-    dd 4000
+    dd 7500
+    dd 0xffff
 
+.rockSling:
+    db 14      ; unit type / image id (1 byte)
+    dd 100    ; unit cost (4 bytes)
+    dd 0      ; unit damage (4 bytes)
+    dd 0      ; attack speed (4 bytes)
+
+.eggAutomatic:
+    db 0      ; unit type / image id (1 byte)
+    dd 200    ; unit cost (4 bytes)
+    dd 0      ; unit damage (4 bytes)
+    dd 0      ; attack speed (4 bytes)
+
+.primitiveCatapult:
+    db 0      ; unit type / image id (1 byte)
+    dd 500    ; unit cost (4 bytes)
+    dd 0      ; unit damage (4 bytes)
+    dd 0      ; attack speed (4 bytes)
+
+_ageData:
+
+.expRequirement:
+    dd 4000
+    dd 16000
+    dd 32000
+    dd 64000 

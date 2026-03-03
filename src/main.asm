@@ -1,6 +1,6 @@
 ; defines
 %define PRINT_BUFFER_SIZE 1024
-%define HEAP_SIZE 0xcb2000 ; ~256 KB
+%define HEAP_SIZE 0x1000000 ; ~256 KB
 %define FALSE 0
 %define TRUE 1
 
@@ -97,7 +97,6 @@ section .bss
     PlayerHealth resb 8
     PlayerTurretSlotAmount resb 8
     specialAbiltyCooldown resb 8
-    nextAgeExpRequirement resb 8
     
     unitQueue resb 16
     unitSpawingTimer resb 16
@@ -152,14 +151,16 @@ _whileLoop:
     cmp byte [debugMode], 1
     je _mainDebugMode
 
+
     clock_tick 60 ; fps
     cmp rax, 0
     je _whileLoop ; no render
 
-    add qword [PlayerGold], 10
-    add qword [PlayerExp], 1
+    add qword [PlayerGold], 5
+    add qword [PlayerExp], 50
 
     call _render
+
 
     cmp dword [specialAbiltyCooldown], 0
     jle _whileLoop ; skip if cooldown is finished

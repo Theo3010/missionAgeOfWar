@@ -20,12 +20,14 @@ _stringConcat:
     ; total_length
     mov r8, rdx
     add r8, r9 ; total_legnth
+    inc r8 ; for 0 padding
     heap_allocate r8
     mov r10, rax ; new ptr
 
     memory_copy rbx, r10, rdx
     add r10, rdx
     memory_copy rcx, r10, r9
+    mov [r10+r9], byte 0 ; add end of string char.
 
     sub r10, rdx ; go back to start of string
     mov rax, r10 ; return ptr to new string

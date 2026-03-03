@@ -82,14 +82,19 @@ _menuUnitSelector:
 
 _menuTurretSelector:
 
+    mov rcx, -1 ; unit type
+
+    mov rax, 0
     cmp byte [menuHover], 0
-    ; turret 1
+    cmove rcx, rax
 
+    mov rax, 1
     cmp byte [menuHover], 1
-    ; turret 2
+    cmove rcx, rax
 
+    mov rax, 2
     cmp byte [menuHover], 2
-    ; turret 3
+    cmove rcx, rax
 
     mov al, [menuSelected]
     mov rbx, 0
@@ -99,6 +104,31 @@ _menuTurretSelector:
 
     mov byte [menuSelected], al
 
+    call _menuPlaceTurret
+
+    ret
+
+_menuPlaceTurret:
+    
+    cmp rcx, -1 ; no turret
+    je _menuPlaceTurretEnd
+
+    imul rcx, 13
+    lea rcx, [_turrets.rockSling+rcx]
+
+    ; check if enough money
+    mov rax, [PlayerGold]
+    xor rdx, rdx
+    mov edx, dword [rcx+1]
+    cmp rax, rdx
+    jl _menuPlaceTurretEnd
+
+    ; check for turret placement
+
+    ; subtract money
+    sub qword [PlayerGold], rdx
+
+_menuPlaceTurretEnd:
     ret
 
 _menuNextAge:
@@ -107,12 +137,10 @@ _menuNextAge:
     mov rbx, rcx
     inc rcx
     
-    mov eax, [nextAgeExpRequirement]
+    mov eax, [_ageData.expRequirement+rbx*4]
     cmp dword [PlayerExp], eax
     cmovge rbx, rcx
     mov qword [PlayerAge], rbx
-
-    ; TODO: update next age exp requrement
 
     ret
 
@@ -120,8 +148,9 @@ _menuNextAge:
 _menuBuyTowerSlot:
     mov rdx, 0
     mov rbx, 1
-
-    mov eax, dword [_turrets.TurretSlotCost]
+    
+    mov rax, [PlayerTurretSlotAmount]
+    mov eax, dword [_turrets.TurretSlotCost+rax*4]
     
     cmp rax, qword [PlayerGold]
     cmovg rax, rdx
@@ -242,7 +271,7 @@ _HUDmenutext:
     times (30 - ($ - .sell)) db 0
 
 .buy:
-    db " - Add a turret spot", 0
+    db "$ - Add a turret spot", 0
     times (30 - ($ - .buy)) db 0
 
 .evolve:

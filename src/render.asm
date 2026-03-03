@@ -56,6 +56,27 @@ _drawBase:
     
     to_string [PlayerHealth] ; uses the string buffer (a tempary place for strings), NOT the heap (no need for free.)
     set_text rax, 0x75, 205, 2, 0x00FF0000, 0b1 ; 
+
+    mov rbx, [PlayerTurretSlotAmount]
+
+_drawBasePlayerTurretLoop:
+
+    cmp rbx, 0
+    je _drawBasePlayerTurretLoopEnd
+
+    mov rcx, 0x60
+    imul rcx, rbx
+    sub rcx, 0x22e
+    neg rcx
+
+    ; draw turret slots
+    draw_image [r10 + 8 * 13], 0x85, rcx, 0b0
+
+    dec rbx
+    jmp _drawBasePlayerTurretLoop
+
+
+_drawBasePlayerTurretLoopEnd:
     
     ; base 2
     draw_image [r10 + 8 * 1], 0x8a0, 0x1dd, 0b1
@@ -195,9 +216,34 @@ _menuNotSkipThree:
     ; menu text
     set_text _renderConst.MainMenuMsg, 900, 10, 3, 0x00FFFF00, 0
 
-    mov eax, dword [_turrets.TurretSlotCost]
-    to_string rax
-    string_concat rax, [HUDbuttonmsgPtr]
+    mov rax, [HUDbuttonmsgPtr] ; base text
+    mov rbx, 0
+
+    ; check if menuselected is 1
+    cmp byte [menuSelected], 0
+    jne _renderMenuTextConcatSkip
+    ; check if menuhover is 2, 3
+
+    cmp byte [menuHover], 3
+    cmove rbx, [PlayerTurretSlotAmount]
+    cmove ebx, dword [_turrets.TurretSlotCost+rbx*4]
+
+    cmp byte [menuHover], 4
+    cmove rbx, [PlayerAge]
+    cmove ebx, dword [_ageData.expRequirement+rbx*4]
+
+    cmp rbx, 0
+    je _renderMenuTextConcatSkip
+    
+    push rax
+    to_string rbx
+    mov rbx, rax
+    pop rax
+    
+    string_concat rbx, rax
+    heap_free rax
+
+_renderMenuTextConcatSkip:
 
     set_text rax, 215, 65, 2, 0x00FFFF00, 0
 
